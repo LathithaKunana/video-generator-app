@@ -4,9 +4,7 @@ const cloudinary = require('cloudinary').v2;
 const multer = require('multer');
 const streamifier = require('streamifier'); // For streaming the buffer to Cloudinary
 const { SHOTSTACK_API_KEY } = require('../config');
-const env = require("dotenv")
 
-env.config()
 
 const router = express.Router();
 
