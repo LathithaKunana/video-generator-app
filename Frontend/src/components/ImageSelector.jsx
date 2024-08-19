@@ -8,10 +8,10 @@ const ImageSelector = ({ setImages }) => {
       files.map(async (file) => {
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('upload_preset', 'rwba17nn'); // Add your Cloudinary upload preset
+        formData.append('upload_preset', 'rc98zxhy'); // Add your Cloudinary upload preset
 
         const response = await axios.post(
-          `https://api.cloudinary.com/v1_1/dnryho2ce/image/upload`,
+          `https://api.cloudinary.com/v1_1/dxhxijoo4/image/upload`,
           formData
         );
         return response.data.secure_url;

@@ -6,10 +6,10 @@ const MusicSelector = ({ setMusic }) => {
     const file = e.target.files[0];
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('upload_preset', 'rwba17nn'); // Add your Cloudinary upload preset
+    formData.append('upload_preset', 'rc98zxhy'); // Add your Cloudinary upload preset
 
     const response = await axios.post(
-      `https://api.cloudinary.com/v1_1/dnryho2ce/video/upload`, // Use video endpoint for audio
+      `https://api.cloudinary.com/v1_1/dxhxijoo4/video/upload`, // Use video endpoint for audio
       formData
     );
 
