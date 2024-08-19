@@ -1,5 +1,4 @@
 module.exports = {
-    CLOUDINARY_URL: 'CLOUDINARY_URL=cloudinary://254116947211962:_uMByDjHSgEukuG5L3aWQlaa1B8@dnryho2ce',
     SHOTSTACK_API_KEY: 'DBfxeU78IfDHT2hpQZnYdn709y75UeCAqMRMCMC3',
   };
   
