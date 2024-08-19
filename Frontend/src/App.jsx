@@ -15,7 +15,7 @@ function App() {
     setLoading(true); // Start loading
     try {
       // Send the URLs of the images and music to the backend
-      const response = await axios.post('https://random-proj.vercel.app/api/video/generate', {
+      const response = await axios.post('http://localhost:5000/api/video/generate', {
         images,
         music,
       });
