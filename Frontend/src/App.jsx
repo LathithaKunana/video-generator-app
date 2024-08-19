@@ -4,6 +4,7 @@ import ImageSelector from './components/ImageSelector';
 import MusicSelector from './components/MusicSelector';
 import VideoPreview from './components/VideoPreview';
 import axios from 'axios';
+import Compressor from 'compressorjs';
 
 function App() {
   const [images, setImages] = useState([]);
@@ -11,13 +12,29 @@ function App() {
   const [videoUrl, setVideoUrl] = useState(null);
   const [loading, setLoading] = useState(false); // Loading state
 
+  const compressImages = (imageFiles) => {
+    return Promise.all(imageFiles.map(file => new Promise((resolve, reject) => {
+      new Compressor(file, {
+        quality: 0.6, // Adjust quality as needed
+        success(result) {
+          resolve(result);
+        },
+        error(err) {
+          reject(err);
+        },
+      });
+    })));
+  };
+
   const handleSubmit = async () => {
     setLoading(true); // Start loading
     try {
+      const compressedImages = await compressImages(images);
+
       const formData = new FormData();
       
-      // Append each selected image file to the FormData
-      images.forEach((image) => {
+      // Append each compressed image file to the FormData
+      compressedImages.forEach((image) => {
         formData.append('images', image);
       });
   
