@@ -25,7 +25,7 @@ function App() {
       formData.append('music', music);
   
       // Send the FormData to the backend
-      const response = await axios.post('https://video-generator-app-backend.vercel.app/api/video/generate', formData, {
+      const response = await axios.post('https://random-proj.vercel.app/api/video/generate', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
