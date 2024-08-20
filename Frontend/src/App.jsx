@@ -20,7 +20,7 @@ function App() {
             console.log(`Polling attempt ${attempts + 1} for video ID: ${id}`);
             await new Promise((resolve) => setTimeout(resolve, 5000)); // Poll every 5 seconds
 
-            statusResponse = await axios.get(`https://video-generator-app-frontend.vercel.app/api/video/status/${id}`);
+            statusResponse = await axios.get(`https://random-proj.vercel.app/api/video/status/${id}`);
             console.log('Status response:', statusResponse.data);
 
             attempts += 1;
@@ -47,7 +47,7 @@ function App() {
 
     try {
         // Send the images and music to the backend to generate the video
-        const generateResponse = await axios.post('http://localhost:5000/api/video/generate', {
+        const generateResponse = await axios.post('https://random-proj.vercel.app/api/video/generate', {
             images,
             music,
         });
