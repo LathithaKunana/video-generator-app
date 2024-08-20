@@ -14,33 +14,32 @@ function App() {
 
   const pollVideoStatus = async (id) => {
     try {
-        let statusResponse;
-        let attempts = 0;
-
-        do {
-            console.log(`Polling attempt ${attempts + 1} for video ID: ${id}`);
-            await new Promise((resolve) => setTimeout(resolve, 5000)); // Poll every 5 seconds
-
-            statusResponse = await axios.get(`https://random-proj.vercel.app/api/video/status/${id}`);
-            console.log('Status response:', statusResponse.data);
-
-            attempts += 1;
-        } while (!statusResponse.data.success && attempts < 20); // Max 20 attempts
-
+      let statusResponse;
+      let attempts = 0;
+  
+      do {
+        console.log(`Polling attempt ${attempts + 1} for video ID: ${id}`);
+        await new Promise((resolve) => setTimeout(resolve, 10000)); // Poll every 10 seconds
+  
+        statusResponse = await axios.get(`http://localhost:5000/api/video/status/${id}`);
+        console.log(`Status response for attempt ${attempts + 1}:`, statusResponse.data);
+  
+        // Check if the response includes the video URL
         if (statusResponse.data.url) {
-            console.log('Video is ready. URL:', statusResponse.data.url);
-            setVideoUrl(statusResponse.data.url);
-        } else {
-            console.error('Video generation did not complete successfully.');
+          setVideoUrl(statusResponse.data.url);
+          return;
         }
+  
+        attempts += 1;
+      } while (attempts < 30);
+  
+      console.error('Video generation did not complete successfully.');
     } catch (error) {
-        console.error('Error polling video status:', error);
-        setLoading(false);
+      console.error('Error polling video status:', error.response?.data || error.message || error);
+      setLoading(false);
     }
-};
-
-
-
+  };
+  
   
 
   const handleSubmit = async () => {
@@ -48,10 +47,10 @@ function App() {
 
     try {
         // Send the images and music to the backend to generate the video
-        const generateResponse = await axios.post('https://random-proj.vercel.app/api/video/generate', {
-            images,
-            music,
-        });
+        const generateResponse = await axios.post('http://localhost:5000/api/video/generate', {
+          media: images,  // Rename images to media
+          music,
+      });
 
         const videoId = generateResponse.data.videoId;
         if (!videoId) throw new Error('Failed to retrieve videoId');
@@ -63,8 +62,7 @@ function App() {
     } finally {
         setLoading(false);
     }
-};
-
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 p-6 flex flex-col items-center">
