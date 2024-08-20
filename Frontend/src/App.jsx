@@ -21,7 +21,7 @@ function App() {
         console.log(`Polling attempt ${attempts + 1} for video ID: ${id}`);
         await new Promise((resolve) => setTimeout(resolve, 10000)); // Poll every 10 seconds
   
-        statusResponse = await axios.get(`http://localhost:5000/api/video/status/${id}`);
+        statusResponse = await axios.get(`https://random-proj.vercel.app/api/video/status/${id}`);
         console.log(`Status response for attempt ${attempts + 1}:`, statusResponse.data);
   
         // Check if the response includes the video URL
@@ -47,7 +47,7 @@ function App() {
 
     try {
         // Send the images and music to the backend to generate the video
-        const generateResponse = await axios.post('http://localhost:5000/api/video/generate', {
+        const generateResponse = await axios.post('https://random-proj.vercel.app/api/video/generate', {
           media: images,  // Rename images to media
           music,
       });
