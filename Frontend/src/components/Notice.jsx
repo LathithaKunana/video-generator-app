@@ -5,7 +5,7 @@ const Notice = () => {
 
   useEffect(() => {
     if (showNotice) {
-      alert("The app is still under construction. You can upload a maximum of 6 images at a time.");
+    //   alert("The app is still under construction. You can upload a maximum of 6 images at a time.");
     }
   }, [showNotice]);
 
