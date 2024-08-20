@@ -9,24 +9,61 @@ function App() {
   const [images, setImages] = useState([]);
   const [music, setMusic] = useState(null);
   const [videoUrl, setVideoUrl] = useState(null);
-  const [loading, setLoading] = useState(false); // Loading state
+  const [loading, setLoading] = useState(false);
+
+  const pollVideoStatus = async (id) => {
+    try {
+        let statusResponse;
+        let attempts = 0;
+
+        do {
+            console.log(`Polling attempt ${attempts + 1} for video ID: ${id}`);
+            await new Promise((resolve) => setTimeout(resolve, 5000)); // Poll every 5 seconds
+
+            statusResponse = await axios.get(`https://video-generator-app-frontend.vercel.app/api/video/status/${id}`);
+            console.log('Status response:', statusResponse.data);
+
+            attempts += 1;
+        } while (!statusResponse.data.success && attempts < 20); // Max 20 attempts
+
+        if (statusResponse.data.url) {
+            console.log('Video is ready. URL:', statusResponse.data.url);
+            setVideoUrl(statusResponse.data.url);
+        } else {
+            console.error('Video generation did not complete successfully.');
+        }
+    } catch (error) {
+        console.error('Error polling video status:', error);
+        setLoading(false);
+    }
+};
+
+
+
+  
 
   const handleSubmit = async () => {
-    setLoading(true); // Start loading
-    try {
-      // Send the URLs of the images and music to the backend
-      const response = await axios.post('https://random-proj.vercel.app/api/video/generate', {
-        images,
-        music,
-      });
+    setLoading(true);
 
-      setVideoUrl(response.data.videoUrl);
+    try {
+        // Send the images and music to the backend to generate the video
+        const generateResponse = await axios.post('http://localhost:5000/api/video/generate', {
+            images,
+            music,
+        });
+
+        const videoId = generateResponse.data.videoId;
+        if (!videoId) throw new Error('Failed to retrieve videoId');
+
+        // Poll the server to check the status of the video generation
+        await pollVideoStatus(videoId);
     } catch (error) {
-      console.error('Error generating video:', error);
+        console.error('Error submitting video generation:', error);
     } finally {
-      setLoading(false); // Stop loading
+        setLoading(false);
     }
-  };
+};
+
 
   return (
     <div className="min-h-screen bg-gray-100 p-6 flex flex-col items-center">
