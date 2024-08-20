@@ -6,6 +6,10 @@ const ImageSelector = ({ setImages }) => {
 
   const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files);
+    if (files.length > 6) {
+        alert("You can upload a maximum of 6 images at a time.");
+        return;
+    }
     setUploading(true);
     const uploadedImages = [];
     const failedUploads = [];

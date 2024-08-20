@@ -4,6 +4,7 @@ import ImageSelector from './components/ImageSelector';
 import MusicSelector from './components/MusicSelector';
 import VideoPreview from './components/VideoPreview';
 import axios from 'axios';
+import Notice from './components/Notice';
 
 function App() {
   const [images, setImages] = useState([]);
@@ -67,6 +68,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6 flex flex-col items-center">
+      <Notice/>
       <div className="w-full max-w-3xl space-y-6">
         <div className="space-y-6 bg-white p-6 rounded-lg shadow-md">
           <ImageSelector setImages={setImages} />
