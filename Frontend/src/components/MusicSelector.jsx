@@ -17,7 +17,7 @@ const MusicSelector = ({ setMusic }) => {
       // Upload the music file to Cloudinary using the video endpoint (suitable for audio files)
       const response = await axios.post(
         `https://api.cloudinary.com/v1_1/dxhxijoo4/video/upload`, // Cloudinary video endpoint for audio files
-        formData
+        formDat
       );
 
       // Update the parent component's state with the uploaded music URL
