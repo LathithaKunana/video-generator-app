@@ -12,19 +12,21 @@ function App() {
   const [videoUrl, setVideoUrl] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Function to poll the server to check the video status
   const pollVideoStatus = async (id) => {
     try {
       let statusResponse;
       let attempts = 0;
   
+      // Poll every 10 seconds, up to 30 attempts
       do {
         console.log(`Polling attempt ${attempts + 1} for video ID: ${id}`);
-        await new Promise((resolve) => setTimeout(resolve, 10000)); // Poll every 10 seconds
+        await new Promise((resolve) => setTimeout(resolve, 10000)); // Wait 10 seconds
   
         statusResponse = await axios.get(`https://random-proj.vercel.app/api/video/status/${id}`);
         console.log(`Status response for attempt ${attempts + 1}:`, statusResponse.data);
   
-        // Check if the response includes the video URL
+        // Check if the video URL is returned
         if (statusResponse.data.url) {
           setVideoUrl(statusResponse.data.url);
           return;
@@ -40,27 +42,26 @@ function App() {
     }
   };
   
-  
-
+  // Function to handle the submission and video generation request
   const handleSubmit = async () => {
     setLoading(true);
 
     try {
-        // Send the images and music to the backend to generate the video
-        const generateResponse = await axios.post('https://random-proj.vercel.app/api/video/generate', {
-          media: images,  // Rename images to media
-          music,
+      // Send selected images and music to the backend for video generation
+      const generateResponse = await axios.post('https://random-proj.vercel.app/api/video/generate', {
+        media: images,  // Rename images to media
+        music,
       });
 
-        const videoId = generateResponse.data.videoId;
-        if (!videoId) throw new Error('Failed to retrieve videoId');
+      const videoId = generateResponse.data.videoId;
+      if (!videoId) throw new Error('Failed to retrieve videoId');
 
-        // Poll the server to check the status of the video generation
-        await pollVideoStatus(videoId);
+      // Poll the server to check the status of the video generation
+      await pollVideoStatus(videoId);
     } catch (error) {
-        console.error('Error submitting video generation:', error);
+      console.error('Error submitting video generation:', error);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -75,7 +76,7 @@ function App() {
             <button
               onClick={handleSubmit}
               className="flex items-center justify-center bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 w-full mt-4"
-              disabled={loading} // Disable button during loading
+              disabled={loading} // Disable button while loading
             >
               {loading ? (
                 <div className="flex items-center">
@@ -96,31 +97,20 @@ function App() {
                     <path
                       className="opacity-75"
                       fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                      d="M4 12a8 8 0 018-8v8H4z"
                     ></path>
                   </svg>
                   Generating...
                 </div>
               ) : (
-                <div className="flex items-center">
+                <>
                   <FaVideo className="mr-2" /> Generate Video
-                </div>
+                </>
               )}
             </button>
           )}
         </div>
-
-        {videoUrl && (
-          <div className="mt-6">
-            <VideoPreview videoUrl={videoUrl} />
-            <button
-              onClick={() => setVideoUrl(null)}
-              className="flex items-center justify-center bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 w-full mt-4"
-            >
-              Generate Another Video
-            </button>
-          </div>
-        )}
+        {videoUrl && <VideoPreview videoUrl={videoUrl} />}
       </div>
     </div>
   );
