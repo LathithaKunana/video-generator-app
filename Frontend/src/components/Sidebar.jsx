@@ -1,14 +1,16 @@
-// Sidebar.jsx
 import React, { useState } from 'react';
-import { FaArrowLeft, FaArrowRight, FaUpload, FaMusic, FaVideo, FaTrashAlt } from 'react-icons/fa';
+import { FaArrowLeft, FaArrowRight, FaUpload, FaMusic, FaVideo, FaTrashAlt, FaSpinner } from 'react-icons/fa';
 import axios from 'axios';
 
 const Sidebar = ({ folders, setFolders }) => {
   const [isOpen, setIsOpen] = useState(true);
+  const [loadingStates, setLoadingStates] = useState({}); // Use an object to track loading state for each folder
 
   const toggleSidebar = () => setIsOpen(!isOpen);
 
   const handleUpload = async (folderName, files) => {
+    setLoadingStates((prevState) => ({ ...prevState, [folderName]: true }));  // Start loading for the specific folder
+
     const updatedFolder = [...folders[folderName]];
     // Upload files to Cloudinary and get URLs
     for (let file of files) {
@@ -23,13 +25,14 @@ const Sidebar = ({ folders, setFolders }) => {
         console.error(`Failed to upload ${file.name}:`, error);
       }
     }
+
     setFolders({ ...folders, [folderName]: updatedFolder });
+    setLoadingStates((prevState) => ({ ...prevState, [folderName]: false }));  // Stop loading for the specific folder
   };
 
-  // Function to handle deletion of a file
   const handleDelete = (folderName, index) => {
     const updatedFolder = [...folders[folderName]];
-    updatedFolder.splice(index, 1); // Remove the item at the specified index
+    updatedFolder.splice(index, 1);  // Remove the item at the specified index
     setFolders({ ...folders, [folderName]: updatedFolder });
   };
 
@@ -49,10 +52,17 @@ const Sidebar = ({ folders, setFolders }) => {
               <div className="flex items-center mb-2">
                 <button
                   onClick={() => document.getElementById(`file-upload-${folderName}`).click()}
-                  className="flex items-center bg-blue-950 p-2 rounded-lg text-white shadow-md hover:bg-blue-600"
+                  className="flex items-center bg-blue-500 p-2 rounded-lg text-white shadow-md hover:bg-blue-600"
+                  disabled={loadingStates[folderName]} // Disable upload button only for the specific folder
                 >
-                  <FaUpload className="mr-2" />
-                  Upload
+                  {loadingStates[folderName] ? (
+                    <FaSpinner className="mr-2 animate-spin" />
+                  ) : (
+                    <>
+                      <FaUpload className="mr-2" />
+                      Upload
+                    </>
+                  )}
                 </button>
                 <input
                   id={`file-upload-${folderName}`}
