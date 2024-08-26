@@ -30,7 +30,7 @@ function App() {
         await new Promise((resolve) => setTimeout(resolve, 10000)); // Wait 10 seconds
 
         statusResponse = await axios.get(
-          `http://localhost:5000/api/video/status/${id}`
+          `https://random-proj.vercel.app/api/video/status/${id}`
         );
         console.log(
           `Status response for attempt ${attempts + 1}:`,
@@ -81,7 +81,7 @@ function App() {
       }
 
       const generateResponse = await axios.post(
-        'http://localhost:5000/api/video/generate',
+        'https://random-proj.vercel.app/api/video/generate',
         { media, music }
       );
 
