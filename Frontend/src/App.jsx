@@ -116,7 +116,7 @@ function App() {
   
       // Generate video
       const generateResponse = await axios.post(
-        'http://localhost:5000/api/video/generate',
+        'https://random-proj.vercel.app/api/video/generate',
         { media, music }
       );
   
