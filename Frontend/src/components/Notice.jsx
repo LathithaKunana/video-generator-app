@@ -12,7 +12,7 @@ const Notice = () => {
   return (
     showNotice && (
       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-        <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+        <div className="flex flex-wrap flex-col m-10 bg-white p-6 rounded-lg shadow-lg ">
           <p className="text-gray-700 mb-4">
             The app is still under construction. You can upload a maximum of 6 images/videos at a time.
           </p>
