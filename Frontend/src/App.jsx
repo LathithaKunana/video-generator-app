@@ -7,6 +7,8 @@ import Notice from './components/Notice';
 import NewSidebar from './components/NewSidebar';  // Import NewSidebar component
 import FinalSidebar from './components/FinalSidebar';  // Import FinalSidebar component
 import Timer from './components/Timer';  // Import Timer component
+import CloudinaryVideoEffects from './components/CloudinaryVideoEffect';
+
 
 function App() {
   const [folders, setFolders] = useState({
@@ -25,18 +27,21 @@ function App() {
   const [isFinalized, setIsFinalized] = useState(false);
   const [timer, setTimer] = useState(null); // To manage the countdown timer
   const [timerVisible, setTimerVisible] = useState(false); // To manage timer visibility
+  const [cloudinaryPublicId, setCloudinaryPublicId] = useState(null);
+  const [showEffects, setShowEffects] = useState(false);
+  const [uploadError, setUploadError] = useState(null);
 
   // Function to poll the server to check the video status
   const pollVideoStatus = async (id) => {
     try {
       let statusResponse;
       let attempts = 0;
-
+  
       // Poll every 10 seconds, up to 30 attempts
       do {
         console.log(`Polling attempt ${attempts + 1} for video ID: ${id}`);
         await new Promise((resolve) => setTimeout(resolve, 10000)); // Wait 10 seconds
-
+  
         statusResponse = await axios.get(
           `https://random-proj.vercel.app/api/video/status/${id}`
         );
@@ -44,16 +49,16 @@ function App() {
           `Status response for attempt ${attempts + 1}:`,
           statusResponse.data
         );
-
+  
         // Check if the video URL is returned
         if (statusResponse.data.url) {
           setVideoUrl(statusResponse.data.url);
-          return;
+          return statusResponse.data.url;  // Return the URL for further use
         }
-
+  
         attempts += 1;
       } while (attempts < 30);
-
+  
       console.error('Video generation did not complete successfully.');
     } catch (error) {
       console.error(
@@ -64,11 +69,32 @@ function App() {
     }
   };
 
+  const uploadToCloudinary = async (videoBlob) => {
+    const formData = new FormData();
+    formData.append('file', videoBlob);
+    formData.append('upload_preset', 'rwba17nn'); // Replace with your Cloudinary upload preset
+  
+    try {
+      console.log('Uploading to Cloudinary...');
+      const response = await axios.post(
+        `https://api.cloudinary.com/v1_1/dnryho2ce/video/upload`,
+        formData
+      );
+      console.log('Cloudinary upload response:', response.data);
+      setCloudinaryPublicId(response.data.public_id);
+      console.log('Set cloudinaryPublicId to:', response.data.public_id);
+    } catch (error) {
+      console.error('Error uploading to Cloudinary:', error);
+      setUploadError('Failed to upload video to Cloudinary. Please try again.');
+    }
+  };
+
+
   const handleSubmit = async () => {
     setLoading(true);
-
+  
     try {
-      // Randomly select one media from each folder and one music file
+      // Randomly select media and music
       const media = Object.keys(folders).reduce((acc, key) => {
         if (key !== 'music' && folders[key].length > 0) {
           const randomIndex = Math.floor(Math.random() * folders[key].length);
@@ -76,34 +102,49 @@ function App() {
         }
         return acc;
       }, []);
+      
       const musicFolder = folders['music'];
-      const music =
-        musicFolder.length > 0
-          ? musicFolder[Math.floor(Math.random() * musicFolder.length)]
-          : null;
-
+      const music = musicFolder.length > 0
+        ? musicFolder[Math.floor(Math.random() * musicFolder.length)]
+        : null;
+  
       if (media.length === 0 || !music) {
         alert('Please add at least one file to each folder and one music file.');
         setLoading(false);
         return;
       }
-
+  
+      // Generate video
       const generateResponse = await axios.post(
-        'https://random-proj.vercel.app/api/video/generate',
+        'http://localhost:5000/api/video/generate',
         { media, music }
       );
-
+  
       const videoId = generateResponse.data.videoId;
       if (!videoId) throw new Error('Failed to retrieve videoId');
-
-      // Poll the server to check the status of the video generation
-      await pollVideoStatus(videoId);
+  
+      // Poll for the video URL
+      const videoUrl = await pollVideoStatus(videoId);
+  
+      if (videoUrl) {
+        console.log('Video URL received:', videoUrl);
+  
+        // Upload the video to Cloudinary
+        const response = await fetch(videoUrl);
+        const videoBlob = await response.blob();
+        await uploadToCloudinary(videoBlob);  // This sets the cloudinaryPublicId
+      } else {
+        console.error('No video URL received after generation');
+      }
+  
     } catch (error) {
       console.error('Error submitting video generation:', error);
     } finally {
       setLoading(false);
     }
   };
+  
+  
 
   // Function to show the new sidebar section
   const handleGenerateSidebar = () => {
@@ -146,13 +187,17 @@ function App() {
     setTimer(newTimer);
   };
 
+  useEffect(() => {
+    console.log('Current cloudinaryPublicId:', cloudinaryPublicId);
+  }, [cloudinaryPublicId]);
+
   return (
     <div className="min-h-screen bg-gray-100 flex">
       {/* Sidebar */}
       <Sidebar folders={folders} setFolders={setFolders} />
       
       {/* Main Content */}
-      <div className="flex-1 p-6 flex flex-col items-center">
+      <div className="flex-1 p-4 mr-16 flex flex-col items-center">
         <Notice />
         <div className="w-full max-w-3xl space-y-6">
           <div className="space-y-6 bg-white p-6 rounded-lg shadow-md">
@@ -178,21 +223,32 @@ function App() {
               </button>
             )}
           </div>
-
           {videoUrl && (
             <>
               <VideoPreview videoUrl={videoUrl} />
-              {/* Show "Generate Sidebar" button after video is generated */}
-              <button
-                onClick={handleGenerateSidebar}
-                className="flex items-center justify-center bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 w-full mt-4"
-              >
+
+              {/* Show the effects button after the Cloudinary publicId is set */}
+              {cloudinaryPublicId ? (
+                <>
+                  <CloudinaryVideoEffects 
+                    publicId={cloudinaryPublicId} 
+                    uploadToCloudinary={uploadToCloudinary}
+                  />
+                  <button
+                    onClick={handleGenerateSidebar}
+                    className="flex items-center justify-center bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 w-full mt-4"
+                  >
                 Generate Sidebar
               </button>
+                </>
+              ) : (
+                <p>Uploading video to apply effects...</p>
+              )}
             </>
           )}
-        </div>
 
+        </div>
+        
         {/* New Sidebar Section that appears after clicking "Generate Sidebar" */}
         {showSidebarSection && (
           <div className="new-sidebar-section flex mt-8">
