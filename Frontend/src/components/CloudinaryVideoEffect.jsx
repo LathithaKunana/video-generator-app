@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { Cloudinary } from "@cloudinary/url-gen";
 import { AdvancedVideo } from '@cloudinary/react';
-import { sepia, grayscale, blur, artisticFilter } from "@cloudinary/url-gen/actions/effect";
+import { sepia, grayscale, blur, artisticFilter, cartoonify } from "@cloudinary/url-gen/actions/effect";
 import { source } from "@cloudinary/url-gen/actions/overlay";
 import { image } from "@cloudinary/url-gen/qualifiers/source";
 import { opacity, brightness } from "@cloudinary/url-gen/actions/adjust";
@@ -19,6 +19,7 @@ const effects = [
   { name: 'Vignette', value: 'vignette' },
   { name: 'Watermark', value: 'watermark' },
   { name: 'Brighten', value: 'bright' },
+  { name: 'Cartoonify', value: 'cartoonify' },
 ];
 //
 const CloudinaryVideoEffects = ({ publicId, uploadToCloudinary }) => {
@@ -45,6 +46,9 @@ const CloudinaryVideoEffects = ({ publicId, uploadToCloudinary }) => {
         switch (effectValue) {
           case 'sepia':
             videoWithEffect.effect(sepia());
+            break;
+          case 'cartoonify':
+            videoWithEffect.effect(cartoonify());
             break;
           case 'grayscale':
             videoWithEffect.effect(grayscale());
