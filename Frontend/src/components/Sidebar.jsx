@@ -12,7 +12,7 @@ import axios from "axios";
 
 const Sidebar = ({ folders, setFolders, setIsTextToSpeech }) => {
   const [isOpen, setIsOpen] = useState(true);
-  const [loadingStates, setLoadingStates] = useState({}); // Use an object to track loading state for each folder
+  const [loadingStates, setLoadingStates] = useState({});
 
   const toggleSidebar = () => setIsOpen(!isOpen);
 
@@ -21,33 +21,38 @@ const Sidebar = ({ folders, setFolders, setIsTextToSpeech }) => {
   }, [folders]);
 
   const handleUpload = async (folderName, files) => {
-    setLoadingStates((prevState) => ({ ...prevState, [folderName]: true })); // Start loading for the specific folder
-
+    setLoadingStates((prevState) => ({ ...prevState, [folderName]: true }));
+  
     const updatedFolder = [...folders[folderName]];
-    // Upload files to Cloudinary and get URLs
     for (let file of files) {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("upload_preset", "rc98zxhy");
-
+  
       try {
         const response = await axios.post(
           "https://api.cloudinary.com/v1_1/dxhxijoo4/upload",
           formData
         );
         updatedFolder.push(response.data.secure_url);
+  
+        // Show success alert for music uploads
+        if (folderName === "music") {
+          window.alert(`${file.name} has been added to the music folder successfully!`);
+        }
       } catch (error) {
         console.error(`Failed to upload ${file.name}:`, error);
       }
     }
-
+  
     setFolders({ ...folders, [folderName]: updatedFolder });
-    setLoadingStates((prevState) => ({ ...prevState, [folderName]: false })); // Stop loading for the specific folder
+    setLoadingStates((prevState) => ({ ...prevState, [folderName]: false }));
   };
+  
 
   const handleDelete = (folderName, index) => {
     const updatedFolder = [...folders[folderName]];
-    updatedFolder.splice(index, 1); // Remove the item at the specified index
+    updatedFolder.splice(index, 1);
     setFolders({ ...folders, [folderName]: updatedFolder });
   };
 
@@ -69,7 +74,6 @@ const Sidebar = ({ folders, setFolders, setIsTextToSpeech }) => {
             <div key={folderName} className="mb-6">
               <h3 className="text-lg font-semibold mb-2">{folderName}</h3>
 
-              {/* Music folder specific options */}
               {folderName === "music" ? (
                 <div className="music-options mb-4">
                   <input
@@ -90,7 +94,7 @@ const Sidebar = ({ folders, setFolders, setIsTextToSpeech }) => {
                     Select Background Song
                   </button>
                   <button
-                    onClick={() => setIsTextToSpeech(true)} // Set to use text-to-speech
+                    onClick={() => setIsTextToSpeech(true)}
                     className="bg-yellow-500 text-white p-2 rounded-lg w-full"
                   >
                     Use Text-to-Speech
@@ -106,7 +110,7 @@ const Sidebar = ({ folders, setFolders, setIsTextToSpeech }) => {
                           .click()
                       }
                       className="flex items-center bg-blue-500 p-2 rounded-lg text-white shadow-md hover:bg-blue-600"
-                      disabled={loadingStates[folderName]} // Disable upload button only for the specific folder
+                      disabled={loadingStates[folderName]}
                     >
                       {loadingStates[folderName] ? (
                         <FaSpinner className="mr-2 animate-spin" />
@@ -129,19 +133,18 @@ const Sidebar = ({ folders, setFolders, setIsTextToSpeech }) => {
                   </div>
                   <div className="grid grid-cols-3 gap-2">
                     {folders[folderName].map((url, index) => {
-                      console.log(
-                        `Processing ${folderName} item ${index}:`,
-                        url
-                      );
+                      console.log(`Processing ${folderName} item ${index}:`, url);
                       let content;
                       if (folderName === "music") {
-                        console.log("Rendering music icon for", url);
-                        content = (
-                          <div className="w-full h-20 flex items-center justify-center bg-gray-700 rounded-lg">
-                            <FaMusic className="text-white text-5xl" />{" "}
-                            {/* Increased icon size for visibility */}
-                          </div>
-                        );
+                        // Regular expression to check if URL contains .mp3 or .wav
+                        if (url.endsWith(".mp3") || url.endsWith(".wav")) {
+                          
+                          content = (
+                            <div className="w-full h-20 flex items-center justify-center bg-gray-700 rounded-lg">
+                              <FaVideo className="text-white text-2xl" />
+                            </div>
+                          );
+                        }
                       } else if (
                         url.endsWith(".jpg") ||
                         url.endsWith(".jpeg") ||
