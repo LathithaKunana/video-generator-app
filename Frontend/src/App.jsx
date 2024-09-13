@@ -48,6 +48,7 @@ function App() {
       });
   
       if (response.data.audioUrl) {
+        alert("Speech created successfully!");
         console.log("Audio URL received from API:", response.data.audioUrl);
         onAudioUrlReceived(response.data.audioUrl);  // Call the callback with the audio URL
       } else {
