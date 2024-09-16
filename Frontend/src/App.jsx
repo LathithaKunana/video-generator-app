@@ -46,7 +46,7 @@ function App() {
   useEffect(() => {
     const fetchVoices = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/voices');
+        const response = await axios.get('https://random-proj.vercel.app/api/voices');
         setVoices(response.data); // Store voices in state
       } catch (error) {
         console.error('Error fetching voices:', error);
@@ -59,7 +59,7 @@ function App() {
   // Function to submit TTS data to your backend API
   const submitToTextToSpeechAPI = async (sentence, voiceCode) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/texttospeech', {
+      const response = await axios.post('https://random-proj.vercel.app/api/texttospeech', {
         sentence,
         voice_code: voiceCode, // Send the selected voice code
       });
@@ -150,7 +150,7 @@ function App() {
         return;
       }
 
-      const generateResponse = await axios.post('http://localhost:5000/api/video/generate', { media, music });
+      const generateResponse = await axios.post('https://random-proj.vercel.app/api/video/generate', { media, music });
   
       const videoId = generateResponse.data.videoId;
       if (!videoId) throw new Error('Failed to retrieve videoId');
@@ -180,7 +180,7 @@ function App() {
       // Poll every 10 seconds, up to 30 attempts
       do {
         await new Promise((resolve) => setTimeout(resolve, 10000));
-        statusResponse = await axios.get(`http://localhost:5000/api/video/status/${id}`);
+        statusResponse = await axios.get(`https://random-proj.vercel.app/api/video/status/${id}`);
         if (statusResponse.data.url) {
           setVideoUrl(statusResponse.data.url);
           return statusResponse.data.url;
