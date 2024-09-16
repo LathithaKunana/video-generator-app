@@ -39,23 +39,42 @@ function App() {
   const [audioUrl, setAudioUrl] = useState('');  // Store generated TTS audio
   const [ttsLoading, setTtsLoading] = useState(false);
   const [foldersUpdateCount, setFoldersUpdateCount] = useState(0);
+  const [voices, setVoices] = useState([]);
+  const [selectedVoice, setSelectedVoice] = useState('en-US-1'); // Default voice
 
+  // Fetch available voices on component mount
+  useEffect(() => {
+    const fetchVoices = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/voices');
+        setVoices(response.data); // Store voices in state
+      } catch (error) {
+        console.error('Error fetching voices:', error);
+      }
+    };
+  
+    fetchVoices();
+  }, []);
+  
   // Function to submit TTS data to your backend API
-  const submitToTextToSpeechAPI = async (sentence, onAudioUrlReceived) => {
+  const submitToTextToSpeechAPI = async (sentence, voiceCode) => {
     try {
-      const response = await axios.post('https://random-proj.vercel.app/api/texttospeech', {
-        sentence,  // Send the constructed sentence in the request body
+      const response = await axios.post('http://localhost:5000/api/texttospeech', {
+        sentence,
+        voice_code: voiceCode, // Send the selected voice code
       });
   
       if (response.data.audioUrl) {
-        alert("Speech created successfully!");
         console.log("Audio URL received from API:", response.data.audioUrl);
-        onAudioUrlReceived(response.data.audioUrl);  // Call the callback with the audio URL
+        setAudioUrl(response.data.audioUrl); // Store audio URL
+        return response.data.audioUrl; // Return the audio URL for further use
       } else {
-        console.error("Failed to generate audio. No URL returned.");
+        console.error('Failed to generate audio. No URL returned.');
+        return null;
       }
     } catch (error) {
-      console.error("Error submitting text to speech API:", error);
+      console.error('Error submitting text to speech API:', error);
+      return null;
     }
   };
   
@@ -65,24 +84,28 @@ function App() {
   
     const sentence = `Hey guys, my name is ${name}. I come from the city of ${city}. My job title is ${job}. I support ${team}, and my best interests are ${interests}.`;
   
-    console.log("Constructed Sentence: ", sentence);
+    console.log('Constructed Sentence: ', sentence);
   
-    await submitToTextToSpeechAPI(sentence, (audioUrl) => {
-      console.log('TTS audio URL received:', audioUrl);
+    // Await the audio URL after submission
+    const audioUrl = await submitToTextToSpeechAPI(sentence, selectedVoice);
   
+    if (audioUrl) {
       setFolders((prevFolders) => {
         const updatedFolders = {
           ...prevFolders,
-          music: [...prevFolders.music, audioUrl],
+          music: [...prevFolders.music, audioUrl], // Add audio URL to the music folder
         };
         console.log('Updated folders.music:', updatedFolders.music);
         return updatedFolders;
       });
-    });
+    } else {
+      console.error('Failed to add audio URL to the music folder');
+    }
   
     setTtsLoading(false);
     setIsTextToSpeech(false);
   };
+  
 
   // Function to upload video to Cloudinary
   const uploadToCloudinary = async (videoBlob) => {
@@ -127,7 +150,7 @@ function App() {
         return;
       }
 
-      const generateResponse = await axios.post('https://random-proj.vercel.app/api/video/generate', { media, music });
+      const generateResponse = await axios.post('http://localhost:5000/api/video/generate', { media, music });
   
       const videoId = generateResponse.data.videoId;
       if (!videoId) throw new Error('Failed to retrieve videoId');
@@ -157,7 +180,7 @@ function App() {
       // Poll every 10 seconds, up to 30 attempts
       do {
         await new Promise((resolve) => setTimeout(resolve, 10000));
-        statusResponse = await axios.get(`https://random-proj.vercel.app/api/video/status/${id}`);
+        statusResponse = await axios.get(`http://localhost:5000/api/video/status/${id}`);
         if (statusResponse.data.url) {
           setVideoUrl(statusResponse.data.url);
           return statusResponse.data.url;
@@ -268,13 +291,26 @@ function App() {
                     onChange={(e) => setInterests(e.target.value)}
                     className="p-2 border border-gray-300 rounded w-full"
                   />
+                  
+                  <select
+                    value={selectedVoice}
+                    onChange={(e) => setSelectedVoice(e.target.value)}
+                    className="p-2 border border-gray-300 rounded w-full"
+                  >
+                    {voices.map((voice) => (
+                      <option key={voice.voice_code} value={voice.voice_code}>
+                        {voice.language_name} - {voice.voice_gender} ({voice.voice_type})
+                      </option>
+                    ))}
+                  </select>
                   <button
                     type="submit"
                     className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 w-full"
                   >
                     Submit
                   </button>
-                </>
+                  
+                </>               
               )}
             </form>
             ) : (

@@ -10,7 +10,7 @@ import {
 } from "react-icons/fa";
 import axios from "axios";
 
-const Sidebar = ({ folders, setFolders, setIsTextToSpeech }) => {
+const Sidebar = ({ folders, setFolders, setIsTextToSpeech, audioUrl }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [loadingStates, setLoadingStates] = useState({});
 
@@ -19,6 +19,20 @@ const Sidebar = ({ folders, setFolders, setIsTextToSpeech }) => {
   useEffect(() => {
     console.log("Sidebar re-rendered with folders:", folders);
   }, [folders]);
+
+  // Update music folder with the new audio URL
+  useEffect(() => {
+    if (audioUrl) {
+      const updatedMusicFolder = [...folders.music, audioUrl];
+      setFolders((prevFolders) => ({
+        ...prevFolders,
+        music: updatedMusicFolder,
+      }));
+
+      // Show success alert when TTS audio is added to the music folder
+      window.alert("Text-to-Speech audio has been added to the music folder successfully!");
+    }
+  }, [audioUrl, folders, setFolders]);
 
   const handleUpload = async (folderName, files) => {
     setLoadingStates((prevState) => ({ ...prevState, [folderName]: true }));
@@ -48,7 +62,6 @@ const Sidebar = ({ folders, setFolders, setIsTextToSpeech }) => {
     setFolders({ ...folders, [folderName]: updatedFolder });
     setLoadingStates((prevState) => ({ ...prevState, [folderName]: false }));
   };
-  
 
   const handleDelete = (folderName, index) => {
     const updatedFolder = [...folders[folderName]];
@@ -133,15 +146,12 @@ const Sidebar = ({ folders, setFolders, setIsTextToSpeech }) => {
                   </div>
                   <div className="grid grid-cols-3 gap-2">
                     {folders[folderName].map((url, index) => {
-                      console.log(`Processing ${folderName} item ${index}:`, url);
                       let content;
                       if (folderName === "music") {
-                        // Regular expression to check if URL contains .mp3 or .wav
                         if (url.endsWith(".mp3") || url.endsWith(".wav")) {
-                          
                           content = (
                             <div className="w-full h-20 flex items-center justify-center bg-gray-700 rounded-lg">
-                              <FaVideo className="text-white text-2xl" />
+                              <FaMusic className="text-white text-2xl" />
                             </div>
                           );
                         }
@@ -164,7 +174,6 @@ const Sidebar = ({ folders, setFolders, setIsTextToSpeech }) => {
                           </div>
                         );
                       } else {
-                        console.log(`Unrecognized file type for URL: ${url}`);
                         content = (
                           <div className="w-full h-20 bg-gray-700 rounded-lg"></div>
                         );
