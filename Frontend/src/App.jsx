@@ -384,7 +384,7 @@ function App() {
                     </select>
                     <button
                       type="submit"
-                      className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 w-full"
+                      className="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
                     >
                       Submit
                     </button>
@@ -395,7 +395,7 @@ function App() {
               Object.values(folders).some((folder) => folder.length > 0) && (
                 <button
                   onClick={handleSubmit}
-                  className="flex items-center justify-center bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 w-full mt-4"
+                  className="flex items-center justify-center bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full mt-4"
                   disabled={loading}
                 >
                   {loading ? (
@@ -423,7 +423,7 @@ function App() {
                   />
                   <button
                     onClick={handleGenerateSidebar}
-                    className="flex items-center justify-center bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 w-full mt-4"
+                    className="flex items-center justify-center bg-neutral-800 text-white px-4 py-2 rounded-lg hover:bg-neutral-600 w-full mt-4"
                   >
                     Generate Sidebar
                   </button>
@@ -449,7 +449,7 @@ function App() {
             <div className="middle-section flex flex-col justify-center items-center mx-4">
               <button
                 onClick={handleRandomSelection}
-                className="random-select-btn bg-yellow-500 text-white p-2 rounded-lg"
+                className="random-select-btn bg-neutral-800 text-white p-2 rounded-lg"
               >
                 Select Random Images
               </button>
