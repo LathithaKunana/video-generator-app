@@ -98,8 +98,8 @@ const Sidebar = ({ folders, setFolders, setIsTextToSpeech, audioUrl, onEditImage
     }
   };
   return (
-    <div className={`flex ${isOpen ? "w-64" : "w-16"} transition-all duration-300 bg-gray-900 h-screen relative`}>
-      <button onClick={toggleSidebar} className="absolute top-4 right-[-14px] bg-gray-900 p-2 rounded-full shadow-md text-white">
+    <div className={`flex ${isOpen ? "w-64" : "w-16"} transition-all duration-300 bg-gray-600 h-screen relative`}>
+      <button onClick={toggleSidebar} className="absolute top-4 right-[-14px] bg-gray-400 p-2 rounded-full shadow-md text-white">
         {isOpen ? <FaArrowLeft /> : <FaArrowRight />}
       </button>
 
@@ -113,17 +113,17 @@ const Sidebar = ({ folders, setFolders, setIsTextToSpeech, audioUrl, onEditImage
                 <>
                   <div className="music-options mb-4">
                     <input id="background-music-upload" type="file" multiple onChange={(e) => handleUpload(folderName, Array.from(e.target.files))} className="hidden" />
-                    <button onClick={() => document.getElementById("background-music-upload").click()} className="bg-blue-500 text-white p-2 rounded-lg mb-2 w-full">
+                    <button onClick={() => document.getElementById("background-music-upload").click()} className="bg-neutral-800 text-white p-2 shadow-md rounded-lg mb-2 w-full">
                       Select Background Song
                     </button>
-                    <button onClick={() => setIsTextToSpeech(true)} className="bg-yellow-500 text-white p-2 rounded-lg w-full">
+                    <button onClick={() => setIsTextToSpeech(true)} className="bg-neutral-800 text-white p-2 rounded-lg w-full">
                       Use Text-to-Speech
                     </button>
                   </div>
 
                   {/* Display Combine button when both TTS and music are available */}
                   {folders.music.length >= 2 && (
-                    <button onClick={handleCombineAudio} className="bg-green-500 text-white p-2 rounded-lg w-full flex items-center justify-center">
+                    <button onClick={handleCombineAudio} className="bg-gray-400 text-white p-2 rounded-lg w-full flex items-center justify-center">
                        Combine audio
                     </button>
                   )}
@@ -131,7 +131,7 @@ const Sidebar = ({ folders, setFolders, setIsTextToSpeech, audioUrl, onEditImage
               ) : (
                 <>
                   <div className="flex items-center mb-2">
-                    <button onClick={() => document.getElementById(`file-upload-${folderName}`).click()} className="flex items-center bg-blue-500 p-2 rounded-lg text-white shadow-md hover:bg-blue-600" disabled={loadingStates[folderName]}>
+                    <button onClick={() => document.getElementById(`file-upload-${folderName}`).click()} className="flex items-center bg-gray-400 p-2 rounded-lg text-white shadow-md hover:bg-gray-800" disabled={loadingStates[folderName]}>
                       {loadingStates[folderName] ? <FaSpinner className="mr-2 animate-spin" /> : <><FaUpload className="mr-2" /> Upload</>}
                     </button>
                     <input id={`file-upload-${folderName}`} type="file" multiple onChange={(e) => handleUpload(folderName, Array.from(e.target.files))} className="hidden" />
