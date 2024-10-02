@@ -1,14 +1,31 @@
 import React, { useState, useEffect } from "react";
-import { FaArrowLeft, FaArrowRight, FaUpload, FaMusic, FaVideo, FaTrashAlt, FaSpinner, FaPlus, FaEdit } from "react-icons/fa";  // Import FaEdit
+import {
+  FaArrowLeft,
+  FaArrowRight,
+  FaUpload,
+  FaMusic,
+  FaVideo,
+  FaTrashAlt,
+  FaSpinner,
+  FaPlus,
+  FaEdit,
+} from "react-icons/fa"; // Import FaEdit
 import axios from "axios";
-import CloudinaryImageEffects from './CloudinaryImageEffects';  // Import the CloudinaryImageEffects component
+import CloudinaryImageEffects from "./CloudinaryImageEffects"; // Import the CloudinaryImageEffects component
 
-const Sidebar = ({ folders, setFolders, setIsTextToSpeech, audioUrl, onEditImage  }) => {
+const Sidebar = ({
+  folders,
+  setFolders,
+  setIsTextToSpeech,
+  audioUrl,
+  onEditImage,
+}) => {
   const [isOpen, setIsOpen] = useState(true);
   const [loadingStates, setLoadingStates] = useState({});
   const [combinedAudioUrl, setCombinedAudioUrl] = useState(null); // Store combined audio URL
-  const [selectedImage, setSelectedImage] = useState(null);  // State to store the selected image for editing
-  const [showImageEditor, setShowImageEditor] = useState(false);  // State to control the visibility of the image editor
+  const [selectedImage, setSelectedImage] = useState(null); // State to store the selected image for editing
+  const [showImageEditor, setShowImageEditor] = useState(false); // State to control the visibility of the image editor
+  const [isConverting, setIsConverting] = useState(false);
 
   const toggleSidebar = () => setIsOpen(!isOpen);
 
@@ -25,7 +42,9 @@ const Sidebar = ({ folders, setFolders, setIsTextToSpeech, audioUrl, onEditImage
         music: updatedMusicFolder,
       }));
 
-      window.alert("Text-to-Speech audio has been added to the music folder successfully!");
+      window.alert(
+        "Text-to-Speech audio has been added to the music folder successfully!"
+      );
     }
   }, [audioUrl, folders, setFolders]);
 
@@ -40,11 +59,16 @@ const Sidebar = ({ folders, setFolders, setIsTextToSpeech, audioUrl, onEditImage
       formData.append("upload_preset", "rwba17nn");
 
       try {
-        const response = await axios.post("https://api.cloudinary.com/v1_1/dnryho2ce/upload", formData);
+        const response = await axios.post(
+          "https://api.cloudinary.com/v1_1/dnryho2ce/upload",
+          formData
+        );
         updatedFolder.push(response.data.secure_url);
 
         if (folderName === "music") {
-          window.alert(`${file.name} has been added to the music folder successfully!`);
+          window.alert(
+            `${file.name} has been added to the music folder successfully!`
+          );
         }
       } catch (error) {
         console.error(`Failed to upload ${file.name}:`, error);
@@ -58,20 +82,27 @@ const Sidebar = ({ folders, setFolders, setIsTextToSpeech, audioUrl, onEditImage
   // Handle audio combination
   const handleCombineAudio = async () => {
     const musicFolder = folders.music;
-    const ttsUrl = musicFolder.find(url => url.includes('https://storage.googleapis.com'));
-    const backgroundMusicUrl = musicFolder.find(url => !url.includes('https://storage.googleapis.com')); // Assuming only one background music
-    
+    const ttsUrl = musicFolder.find((url) =>
+      url.includes("https://storage.googleapis.com")
+    );
+    const backgroundMusicUrl = musicFolder.find(
+      (url) => !url.includes("https://storage.googleapis.com")
+    ); // Assuming only one background music
+
     if (ttsUrl && backgroundMusicUrl) {
       try {
-        const response = await axios.post("https://random-proj.vercel.app/api/combine-audio", { ttsUrl, musicUrl: backgroundMusicUrl });
+        const response = await axios.post(
+          "https://random-proj.vercel.app/api/combine-audio",
+          { ttsUrl, musicUrl: backgroundMusicUrl }
+        );
         const { combinedAudioUrl } = response.data;
-        
+
         // Replace existing music folder content with the new combined audio URL
         setFolders((prevFolders) => ({
           ...prevFolders,
           music: [combinedAudioUrl],
         }));
-        
+
         setCombinedAudioUrl(combinedAudioUrl);
         window.alert("TTS and background music combined successfully!");
       } catch (error) {
@@ -91,15 +122,60 @@ const Sidebar = ({ folders, setFolders, setIsTextToSpeech, audioUrl, onEditImage
 
   // Handle edit click for images
   const handleEdit = (image) => {
-    if (typeof onEditImage === 'function') {
+    if (typeof onEditImage === "function") {
       onEditImage(image);
     } else {
-      console.error('onEditImage is not a function');
+      console.error("onEditImage is not a function");
     }
   };
+
+  const handleConvertToVideo = async () => {
+    if (folders.backgroundImage.length === 0) {
+      alert("No image available to convert.");
+      return;
+    }
+
+    setIsConverting(true);
+    const imageUrl = folders.backgroundImage[0]; // Assuming we're converting the first image
+
+    try {
+      const response = await axios.post("https://random-proj.vercel.app/api/convert-to-video", { imageUrl });
+      const { videoUrl, action } = response.data;
+
+      if (action === 'replace_folder') {
+        // Replace the entire backgroundImage folder with the new video URL
+        setFolders(prevFolders => ({
+          ...prevFolders,
+          backgroundImage: [videoUrl]
+        }));
+      } else {
+        // Fallback to the previous behavior if 'replace_folder' action is not specified
+        setFolders(prevFolders => ({
+          ...prevFolders,
+          backgroundImage: [videoUrl, ...prevFolders.backgroundImage]
+        }));
+      }
+
+      alert("Image successfully converted to video!");
+    } catch (error) {
+      console.error("Error converting image to video:", error);
+      alert("Failed to convert image to video. Please try again.");
+    } finally {
+      setIsConverting(false);
+    }
+  };
+
+
   return (
-    <div className={`flex ${isOpen ? "w-64" : "w-16"} transition-all duration-300 bg-gray-600 h-screen relative`}>
-      <button onClick={toggleSidebar} className="absolute top-4 right-[-14px] bg-gray-400 p-2 rounded-full shadow-md text-white">
+    <div
+      className={`flex ${
+        isOpen ? "w-64" : "w-16"
+      } transition-all duration-300 bg-gray-600 h-screen relative`}
+    >
+      <button
+        onClick={toggleSidebar}
+        className="absolute top-4 right-[-14px] bg-gray-400 p-2 rounded-full shadow-md text-white"
+      >
         {isOpen ? <FaArrowLeft /> : <FaArrowRight />}
       </button>
 
@@ -112,30 +188,91 @@ const Sidebar = ({ folders, setFolders, setIsTextToSpeech, audioUrl, onEditImage
               {folderName === "music" ? (
                 <>
                   <div className="music-options mb-4">
-                    <input id="background-music-upload" type="file" multiple onChange={(e) => handleUpload(folderName, Array.from(e.target.files))} className="hidden" />
-                    <button onClick={() => document.getElementById("background-music-upload").click()} className="bg-neutral-800 text-white p-2 shadow-md rounded-lg mb-2 w-full">
+                    <input
+                      id="background-music-upload"
+                      type="file"
+                      multiple
+                      onChange={(e) =>
+                        handleUpload(folderName, Array.from(e.target.files))
+                      }
+                      className="hidden"
+                    />
+                    <button
+                      onClick={() =>
+                        document
+                          .getElementById("background-music-upload")
+                          .click()
+                      }
+                      className="bg-neutral-800 text-white p-2 shadow-md rounded-lg mb-2 w-full"
+                    >
                       Select Background Song
                     </button>
-                    <button onClick={() => setIsTextToSpeech(true)} className="bg-neutral-800 text-white p-2 rounded-lg w-full">
+                    <button
+                      onClick={() => setIsTextToSpeech(true)}
+                      className="bg-neutral-800 text-white p-2 rounded-lg w-full"
+                    >
                       Use Text-to-Speech
                     </button>
                   </div>
 
                   {/* Display Combine button when both TTS and music are available */}
                   {folders.music.length >= 2 && (
-                    <button onClick={handleCombineAudio} className="bg-gray-400 text-white p-2 rounded-lg w-full flex items-center justify-center">
-                       Combine audio
+                    <button
+                      onClick={handleCombineAudio}
+                      className="bg-gray-400 text-white p-2 rounded-lg w-full flex items-center justify-center"
+                    >
+                      Combine audio
                     </button>
                   )}
                 </>
               ) : (
                 <>
                   <div className="flex items-center mb-2">
-                    <button onClick={() => document.getElementById(`file-upload-${folderName}`).click()} className="flex items-center bg-gray-400 p-2 rounded-lg text-white shadow-md hover:bg-gray-800" disabled={loadingStates[folderName]}>
-                      {loadingStates[folderName] ? <FaSpinner className="mr-2 animate-spin" /> : <><FaUpload className="mr-2" /> Upload</>}
+                    <button
+                      onClick={() =>
+                        document
+                          .getElementById(`file-upload-${folderName}`)
+                          .click()
+                      }
+                      className="flex items-center bg-gray-400 p-2 rounded-lg text-white shadow-md hover:bg-gray-800"
+                      disabled={loadingStates[folderName]}
+                    >
+                      {loadingStates[folderName] ? (
+                        <FaSpinner className="mr-2 animate-spin" />
+                      ) : (
+                        <>
+                          <FaUpload className="mr-2" /> Upload
+                        </>
+                      )}
                     </button>
-                    <input id={`file-upload-${folderName}`} type="file" multiple onChange={(e) => handleUpload(folderName, Array.from(e.target.files))} className="hidden" />
+                    <input
+                      id={`file-upload-${folderName}`}
+                      type="file"
+                      multiple
+                      onChange={(e) =>
+                        handleUpload(folderName, Array.from(e.target.files))
+                      }
+                      className="hidden"
+                    />
                   </div>
+
+                  {folderName === "backgroundImage" &&
+                    folders[folderName].length > 0 && (
+                      <button
+                        onClick={handleConvertToVideo}
+                        className="bg-blue-500 text-white p-2 rounded-lg w-full mb-2 hover:bg-blue-600 disabled:bg-gray-400"
+                        disabled={isConverting}
+                      >
+                        {isConverting ? (
+                          <>
+                            <FaSpinner className="inline-block mr-2 animate-spin" />
+                            Converting...
+                          </>
+                        ) : (
+                          "Convert to Video"
+                        )}
+                      </button>
+                    )}
                 </>
               )}
 
@@ -148,11 +285,25 @@ const Sidebar = ({ folders, setFolders, setIsTextToSpeech, audioUrl, onEditImage
 
                   let content;
                   if (isAudio) {
-                    content = <div className="w-full h-20 flex items-center justify-center bg-gray-700 rounded-lg mt-2"><FaMusic className="text-white text-2xl" /></div>;
+                    content = (
+                      <div className="w-full h-20 flex items-center justify-center bg-gray-700 rounded-lg mt-2">
+                        <FaMusic className="text-white text-2xl" />
+                      </div>
+                    );
                   } else if (isImage) {
-                    content = <img src={url} alt={`uploaded ${folderName}`} className="w-full h-20 object-cover rounded-lg" />;
+                    content = (
+                      <img
+                        src={url}
+                        alt={`uploaded ${folderName}`}
+                        className="w-full h-20 object-cover rounded-lg"
+                      />
+                    );
                   } else if (isVideo) {
-                    content = <div className="w-full h-20 flex items-center justify-center bg-gray-700 rounded-lg"><FaVideo className="text-white text-2xl" /></div>;
+                    content = (
+                      <div className="w-full h-20 flex items-center justify-center bg-gray-700 rounded-lg">
+                        <FaVideo className="text-white text-2xl" />
+                      </div>
+                    );
                   } else {
                     content = null;
                   }
@@ -161,11 +312,17 @@ const Sidebar = ({ folders, setFolders, setIsTextToSpeech, audioUrl, onEditImage
                     <div key={index} className="relative group">
                       {content}
                       <div className="absolute top-0 right-0 m-1 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => handleDelete(folderName, index)} className="p-1 bg-red-500 text-white rounded-full text-sm">
+                        <button
+                          onClick={() => handleDelete(folderName, index)}
+                          className="p-1 bg-red-500 text-white rounded-full text-sm"
+                        >
                           <FaTrashAlt />
                         </button>
                         {isImage && (
-                          <button onClick={() => handleEdit(url)} className="p-1 bg-blue-500 text-white rounded-full text-sm">
+                          <button
+                            onClick={() => handleEdit(url)}
+                            className="p-1 bg-blue-500 text-white rounded-full text-sm"
+                          >
                             <FaEdit />
                           </button>
                         )}
