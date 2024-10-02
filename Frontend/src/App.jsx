@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaVideo } from "react-icons/fa";
+import { FaVideo, FaSpinner } from "react-icons/fa";
 import Sidebar from "./components/Sidebar";
 import VideoPreview from "./components/VideoPreview";
 import axios from "axios";
@@ -12,6 +12,7 @@ import CloudinaryImageEffects from "./components/CloudinaryImageEffects";
 
 function App() {
   const [folders, setFolders] = useState({
+    backgroundImage: [],
     images: [],
     videos: [],
     gifs: [],
@@ -30,27 +31,29 @@ function App() {
   const [cloudinaryPublicId, setCloudinaryPublicId] = useState(null);
   const [showEffects, setShowEffects] = useState(false);
   const [uploadError, setUploadError] = useState(null);
-  const [editingImage, setEditingImage] = useState(null); // Image to be edited
-  const [showEditor, setShowEditor] = useState(false); // Control when to show the editor
-
-  const [isTextToSpeech, setIsTextToSpeech] = useState(false); // Manage TTS state
+  const [editingImage, setEditingImage] = useState(null);
+  const [showEditor, setShowEditor] = useState(false);
+  const [isTextToSpeech, setIsTextToSpeech] = useState(false);
   const [name, setName] = useState("");
   const [city, setCity] = useState("");
   const [team, setTeam] = useState("");
   const [job, setJob] = useState("");
   const [interests, setInterests] = useState("");
-  const [audioUrl, setAudioUrl] = useState(""); // Store generated TTS audio
+  const [audioUrl, setAudioUrl] = useState("");
   const [ttsLoading, setTtsLoading] = useState(false);
   const [foldersUpdateCount, setFoldersUpdateCount] = useState(0);
   const [voices, setVoices] = useState([]);
-  const [selectedVoice, setSelectedVoice] = useState("en-US-1"); // Default voice
+  const [selectedVoice, setSelectedVoice] = useState("en-US-1");
   const [editingImageUrl, setEditingImageUrl] = useState(null);
+  const [generatedVideoUrl, setGeneratedVideoUrl] = useState(null); // Add this line
+  const [isAddingBackground, setIsAddingBackground] = useState(false);
+
   // Fetch available voices on component mount
   useEffect(() => {
     const fetchVoices = async () => {
       try {
         const response = await axios.get("https://random-proj.vercel.app/api/voices");
-        setVoices(response.data); // Store voices in state
+        setVoices(response.data);
       } catch (error) {
         console.error("Error fetching voices:", error);
       }
@@ -66,14 +69,14 @@ function App() {
         "https://random-proj.vercel.app/api/texttospeech",
         {
           sentence,
-          voice_code: voiceCode, // Send the selected voice code
+          voice_code: voiceCode,
         }
       );
 
       if (response.data.audioUrl) {
         console.log("Audio URL received from API:", response.data.audioUrl);
-        setAudioUrl(response.data.audioUrl); // Store audio URL
-        return response.data.audioUrl; // Return the audio URL for further use
+        setAudioUrl(response.data.audioUrl);
+        return response.data.audioUrl;
       } else {
         console.error("Failed to generate audio. No URL returned.");
         return null;
@@ -99,7 +102,7 @@ function App() {
       setFolders((prevFolders) => {
         const updatedFolders = {
           ...prevFolders,
-          music: [...prevFolders.music, audioUrl], // Add audio URL to the music folder
+          music: [...prevFolders.music, audioUrl],
         };
         console.log("Updated folders.music:", updatedFolders.music);
         return updatedFolders;
@@ -113,11 +116,11 @@ function App() {
   };
 
   const handleEditImage = (imageUrl) => {
-    const publicId = imageUrl.split('/').pop().split('.')[0];
+    const publicId = imageUrl.split("/").pop().split(".")[0];
     setEditingImage(publicId);
     setEditingImageUrl(imageUrl);
   };
-  // Function to upload video to Cloudinary
+
   const uploadToCloudinary = async (videoBlob) => {
     const formData = new FormData();
     formData.append("file", videoBlob);
@@ -141,7 +144,7 @@ function App() {
     const formData = new FormData();
     formData.append("file", imageFile);
     formData.append("upload_preset", "rwba17nn");
-  
+
     try {
       console.log("Uploading to Cloudinary...");
       const response = await axios.post(
@@ -149,11 +152,10 @@ function App() {
         formData
       );
       console.log("Cloudinary upload response:", response.data);
-      
-      // Update the folders state with the new image URL
-      setFolders(prevFolders => {
-        const updatedFolders = {...prevFolders};
-        Object.keys(updatedFolders).forEach(folderName => {
+
+      setFolders((prevFolders) => {
+        const updatedFolders = { ...prevFolders };
+        Object.keys(updatedFolders).forEach((folderName) => {
           const index = updatedFolders[folderName].indexOf(editingImageUrl);
           if (index !== -1) {
             updatedFolders[folderName][index] = response.data.secure_url;
@@ -173,20 +175,30 @@ function App() {
       setUploadError("Failed to upload image to Cloudinary. Please try again.");
     }
   };
-  // Handle video generation
+
   const handleSubmit = async () => {
     setLoading(true);
 
     try {
       const media = Object.keys(folders).reduce((acc, key) => {
-        if (key !== "music" && folders[key].length > 0) {
+        if (
+          key !== "music" &&
+          key !== "backgroundImage" &&
+          folders[key].length > 0
+        ) {
           const randomIndex = Math.floor(Math.random() * folders[key].length);
           acc.push(folders[key][randomIndex]);
         }
         return acc;
       }, []);
 
-      // If TTS is selected, use audioUrl; otherwise, select random music
+      const backgroundImage =
+        folders.backgroundImage.length > 0
+          ? folders.backgroundImage[
+              Math.floor(Math.random() * folders.backgroundImage.length)
+            ]
+          : null;
+
       const music = isTextToSpeech
         ? audioUrl
         : folders.music.length > 0
@@ -203,7 +215,7 @@ function App() {
 
       const generateResponse = await axios.post(
         "https://random-proj.vercel.app/api/video/generate",
-        { media, music }
+        { media, music, backgroundImage }
       );
 
       const videoId = generateResponse.data.videoId;
@@ -214,7 +226,8 @@ function App() {
       if (videoUrl) {
         const response = await fetch(videoUrl);
         const videoBlob = await response.blob();
-        await uploadToCloudinary(videoBlob); // Upload the generated video to Cloudinary
+        await uploadToCloudinary(videoBlob);
+        setGeneratedVideoUrl(videoUrl); // Add this line
       } else {
         console.error("No video URL received after generation");
       }
@@ -230,7 +243,6 @@ function App() {
       let statusResponse;
       let attempts = 0;
 
-      // Poll every 10 seconds, up to 30 attempts
       do {
         await new Promise((resolve) => setTimeout(resolve, 10000));
         statusResponse = await axios.get(
@@ -250,6 +262,29 @@ function App() {
         error.response?.data || error.message || error
       );
       setLoading(false);
+    }
+  };
+
+  const handleAddBackground = async () => {
+    // Add this function
+    setIsAddingBackground(true);
+    try {
+      const response = await axios.post(
+        "https://random-proj.vercel.app/api/overlay-videos",
+        {
+          backgroundVideoUrl: folders.backgroundImage[0], // Assuming there's always one background video
+          generatedVideoUrl,
+        }
+      );
+
+      const data = response.data; // Modify this line
+      if (data.videoUrl) {
+        setVideoUrl(data.videoUrl);
+      }
+    } catch (error) {
+      console.error("Error adding background:", error);
+    } finally {
+      setIsAddingBackground(false);
     }
   };
 
@@ -298,7 +333,7 @@ function App() {
     <div className="min-h-screen bg-gray-100 flex">
       {/* Sidebar */}
       <Sidebar
-        key={foldersUpdateCount} // Add this key prop
+        key={foldersUpdateCount}
         folders={folders}
         setFolders={setFolders}
         setIsTextToSpeech={setIsTextToSpeech}
@@ -313,7 +348,7 @@ function App() {
               <h1 className="text-xl font-semibold">Video generating tool</h1>
             </div>
             {editingImage && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center  justify-center z-50">
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                 <div className="bg-white p-4 rounded-lg max-w-3xl w-4/5 max-h-[90vh] overflow-y-auto">
                   <h2 className="text-2xl font-bold mb-4">Edit Image</h2>
                   <CloudinaryImageEffects
@@ -336,7 +371,7 @@ function App() {
             {isTextToSpeech ? (
               <form onSubmit={handleTTSSubmit} className="space-y-4 mt-4">
                 {ttsLoading ? (
-                  <div className="loader">Loading...</div> // Loader while waiting for TTS URL
+                  <div className="loader">Loading...</div>
                 ) : (
                   <>
                     <input
@@ -408,9 +443,23 @@ function App() {
                 </button>
               )
             )}
+            {generatedVideoUrl && ( // Add this block
+              <button
+                onClick={handleAddBackground}
+                className="flex items-center justify-center bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full mt-4"
+              >
+                {isAddingBackground ? (
+                  <>
+                    <FaSpinner className="inline-block mr-2 animate-spin" />
+                    Adding background...
+                  </>
+                ) : (
+                  "Add background"
+                )}
+              </button>
+            )}
           </div>
 
-          {/* Video Preview and Effects */}
           {videoUrl && (
             <>
               <VideoPreview videoUrl={videoUrl} />
@@ -435,7 +484,6 @@ function App() {
           )}
         </div>
 
-        {/* New Sidebar Section that appears after clicking "Generate Sidebar" */}
         {showSidebarSection && (
           <div className="new-sidebar-section flex mt-8">
             <NewSidebar
