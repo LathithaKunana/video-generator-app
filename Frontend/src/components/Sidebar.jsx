@@ -134,36 +134,47 @@ const Sidebar = ({
       alert("No image available to convert.");
       return;
     }
-
+  
     setIsConverting(true);
     const imageUrl = folders.backgroundImage[0]; // Assuming we're converting the first image
-
+  
     try {
       const response = await axios.post("https://random-proj.vercel.app/api/convert-to-video", { imageUrl });
-      const { videoUrl, action } = response.data;
-
-      if (action === 'replace_folder') {
-        // Replace the entire backgroundImage folder with the new video URL
-        setFolders(prevFolders => ({
-          ...prevFolders,
-          backgroundImage: [videoUrl]
-        }));
-      } else {
-        // Fallback to the previous behavior if 'replace_folder' action is not specified
-        setFolders(prevFolders => ({
-          ...prevFolders,
-          backgroundImage: [videoUrl, ...prevFolders.backgroundImage]
-        }));
-      }
-
-      alert("Image successfully converted to video!");
+      const { jobId } = response.data;
+  
+      const checkStatus = async () => {
+        try {
+          const statusResponse = await axios.get(`https://random-proj.vercel.app/api/check-job-status/${jobId}`);
+          const { status, videoUrl } = statusResponse.data;
+  
+          if (status === 'done') {
+            setFolders(prevFolders => ({
+              ...prevFolders,
+              backgroundImage: [videoUrl]
+            }));
+            alert("Image successfully converted to video!");
+            setIsConverting(false);
+          } else if (status === 'failed') {
+            alert("Failed to convert image to video.");
+            setIsConverting(false);
+          } else {
+            setTimeout(checkStatus, 5000); // Poll every 5 seconds
+          }
+        } catch (error) {
+          console.error("Error checking job status:", error);
+          alert("Failed to check job status. Please try again.");
+          setIsConverting(false);
+        }
+      };
+  
+      checkStatus();
     } catch (error) {
       console.error("Error converting image to video:", error);
       alert("Failed to convert image to video. Please try again.");
-    } finally {
       setIsConverting(false);
     }
   };
+  
 
 
   return (
