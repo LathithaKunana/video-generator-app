@@ -183,7 +183,7 @@ function App() {
       setFolders((prevFolders) => {
         const updatedFolders = {
           ...prevFolders,
-          UserIntro: [...prevFolders.MatchdayInfo, audioUrl],
+          MatchdayInfo: [...prevFolders.MatchdayInfo, audioUrl],
         };
         console.log("Updated folders.music:", updatedFolders.MatchdayInfo);
         return updatedFolders;
@@ -210,9 +210,9 @@ function App() {
       setFolders((prevFolders) => {
         const updatedFolders = {
           ...prevFolders,
-          UserIntro: [...prevFolders.ProfessionalBand, audioUrl],
+          ProfessionalBrand: [...prevFolders.ProfessionalBrand, audioUrl],
         };
-        console.log("Updated folders.music:", updatedFolders.ProfessionalBand);
+        console.log("Updated folders.music:", updatedFolders.ProfessionalBrand);
         return updatedFolders;
       });
     } else {
@@ -237,7 +237,7 @@ function App() {
       setFolders((prevFolders) => {
         const updatedFolders = {
           ...prevFolders,
-          UserIntro: [...prevFolders.MatchdayActivities, audioUrl],
+          MatchdayActivities: [...prevFolders.MatchdayActivities, audioUrl],
         };
         console.log("Updated folders.music:", updatedFolders.MatchdayActivities);
         return updatedFolders;
@@ -264,7 +264,7 @@ function App() {
       setFolders((prevFolders) => {
         const updatedFolders = {
           ...prevFolders,
-          UserIntro: [...prevFolders.Favorites, audioUrl],
+          Favorites: [...prevFolders.Favorites, audioUrl],
         };
         console.log("Updated folders.music:", updatedFolders.Favorites);
         return updatedFolders;
@@ -291,7 +291,7 @@ function App() {
       setFolders((prevFolders) => {
         const updatedFolders = {
           ...prevFolders,
-          UserIntro: [...prevFolders.MusicVidSong, audioUrl],
+          MusicVidSong: [...prevFolders.MusicVidSong, audioUrl],
         };
         console.log("Updated folders.music:", updatedFolders.MusicVidSong);
         return updatedFolders;
