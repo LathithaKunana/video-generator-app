@@ -143,7 +143,7 @@ const Sidebar = ({
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/convert-to-video",
+        "https://random-proj.vercel.app/api/convert-to-video",
         { imageUrl }
       );
       const { jobId } = response.data;
@@ -151,7 +151,7 @@ const Sidebar = ({
       const checkStatus = async () => {
         try {
           const statusResponse = await axios.get(
-            `http://localhost:5000/api/check-job-status/${jobId}`
+            `https://random-proj.vercel.app/api/check-job-status/${jobId}`
           );
           const { status, videoUrl } = statusResponse.data;
 
@@ -214,7 +214,7 @@ const Sidebar = ({
 
       try {
         const response = await axios.post(
-          "http://localhost:5000/api/combine-media-and-audio",
+          "https://random-proj.vercel.app/api/combine-media-and-audio",
           { imageUrl: mediaUrl, ttsUrl, audioDuration }
         );
         const { jobId } = response.data;
@@ -222,7 +222,7 @@ const Sidebar = ({
         const checkStatus = async () => {
           try {
             const statusResponse = await axios.get(
-              `http://localhost:5000/api/check-job-status/${jobId}`
+              `https://random-proj.vercel.app/api/check-job-status/${jobId}`
             );
             const { status, videoUrl } = statusResponse.data;
 

@@ -78,7 +78,7 @@ function App() {
     const fetchVoices = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/voices"
+          "https://random-proj.vercel.app/api/voices"
         );
         setVoices(response.data);
       } catch (error) {
@@ -93,7 +93,7 @@ function App() {
   const submitToTextToSpeechAPI = async (sentence, voiceCode) => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/texttospeech",
+        "https://random-proj.vercel.app/api/texttospeech",
         {
           sentence,
           voice_code: voiceCode,
@@ -413,7 +413,7 @@ function App() {
   
       // Add background image if present
       const generateResponse = await axios.post(
-        "http://localhost:5000/api/video/generate",
+        "https://random-proj.vercel.app/api/video/generate",
         { media: mediaWithStartTimes, music }
       );
   
@@ -474,7 +474,7 @@ function App() {
       do {
         await new Promise((resolve) => setTimeout(resolve, 10000));
         statusResponse = await axios.get(
-          `http://localhost:5000/api/video/status/${id}`
+          `https://random-proj.vercel.app/api/video/status/${id}`
         );
         if (statusResponse.data.url) {
           setVideoUrl(statusResponse.data.url);
@@ -498,7 +498,7 @@ function App() {
     setIsAddingBackground(true);
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/overlay-videos",
+        "hhttps://random-proj.vercel.app/api/overlay-videos",
         {
           backgroundVideoUrl: folders.backgroundImage[0], // Assuming there's always one background video
           generatedVideoUrl,
