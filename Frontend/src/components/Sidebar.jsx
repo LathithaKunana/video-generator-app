@@ -19,6 +19,7 @@ const Sidebar = ({
   setIsTextToSpeech,
   audioUrl,
   onEditImage,
+  setSelectedFolder,
 }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [loadingStates, setLoadingStates] = useState({});
@@ -134,27 +135,32 @@ const Sidebar = ({
       alert("No image available to convert.");
       return;
     }
-  
+
     setIsConverting(true);
     const imageUrl = folders.backgroundImage[0]; // Assuming we're converting the first image
-  
+
     try {
-      const response = await axios.post("https://random-proj.vercel.app/api/convert-to-video", { imageUrl });
+      const response = await axios.post(
+        "http://localhost:5000/api/convert-to-video",
+        { imageUrl }
+      );
       const { jobId } = response.data;
-  
+
       const checkStatus = async () => {
         try {
-          const statusResponse = await axios.get(`https://random-proj.vercel.app/api/check-job-status/${jobId}`);
+          const statusResponse = await axios.get(
+            `http://localhost:5000/api/check-job-status/${jobId}`
+          );
           const { status, videoUrl } = statusResponse.data;
-  
-          if (status === 'done') {
-            setFolders(prevFolders => ({
+
+          if (status === "done") {
+            setFolders((prevFolders) => ({
               ...prevFolders,
-              backgroundImage: [videoUrl]
+              backgroundImage: [videoUrl],
             }));
             alert("Image successfully converted to video!");
             setIsConverting(false);
-          } else if (status === 'failed') {
+          } else if (status === "failed") {
             alert("Failed to convert image to video.");
             setIsConverting(false);
           } else {
@@ -166,7 +172,7 @@ const Sidebar = ({
           setIsConverting(false);
         }
       };
-  
+
       checkStatus();
     } catch (error) {
       console.error("Error converting image to video:", error);
@@ -174,8 +180,6 @@ const Sidebar = ({
       setIsConverting(false);
     }
   };
-  
-
 
   return (
     <div
@@ -195,7 +199,6 @@ const Sidebar = ({
           {Object.keys(folders).map((folderName) => (
             <div key={folderName} className="mb-6">
               <h3 className="text-lg font-semibold mb-2">{folderName}</h3>
-
               {folderName === "music" ? (
                 <>
                   <div className="music-options mb-4">
@@ -219,7 +222,10 @@ const Sidebar = ({
                       Select Background Song
                     </button>
                     <button
-                      onClick={() => setIsTextToSpeech(true)}
+                      onClick={() => {
+                        setSelectedFolder("music");
+                        setIsTextToSpeech(true);
+                      }}
                       className="bg-neutral-800 text-white p-2 rounded-lg w-full"
                     >
                       Use Text-to-Speech
@@ -238,7 +244,7 @@ const Sidebar = ({
                 </>
               ) : (
                 <>
-                  <div className="flex items-center mb-2">
+                  <div className="flex-col items-center mb-2">
                     <button
                       onClick={() =>
                         document
@@ -256,6 +262,20 @@ const Sidebar = ({
                         </>
                       )}
                     </button>
+                    
+                        <button
+                          onClick={() => {
+                            console.log("Folder clicked:", folderName); // Debug to see if folderName is correct
+                            setSelectedFolder(folderName);
+                            setIsTextToSpeech(true);
+                          }}
+                          className="bg-neutral-800 mt-4 text-white p-2 rounded-lg w-full"
+                        >
+                          Use Text-to-Speech
+                        </button>
+                     
+                    
+
                     <input
                       id={`file-upload-${folderName}`}
                       type="file"
