@@ -367,56 +367,66 @@ function App() {
 
   const handleSubmit = async () => {
     setLoading(true);
-
+  
     try {
-      const media = Object.keys(folders).reduce((acc, key) => {
-        if (
-          key !== "music" &&
-          key !== "backgroundImage" &&
-          folders[key].length > 0
-        ) {
-          const randomIndex = Math.floor(Math.random() * folders[key].length);
-          acc.push(folders[key][randomIndex]);
-        }
-        return acc;
-      }, []);
-
+      let mediaWithDurations = await Promise.all(
+        Object.keys(folders).reduce((acc, key) => {
+          if (
+            key !== "music" &&
+            key !== "backgroundImage" &&
+            folders[key].length > 0
+          ) {
+            const randomIndex = Math.floor(Math.random() * folders[key].length);
+            acc.push(getDurationAndType(folders[key][randomIndex]));
+          }
+          return acc;
+        }, [])
+      );
+  
       const backgroundImage =
         folders.backgroundImage.length > 0
           ? folders.backgroundImage[
               Math.floor(Math.random() * folders.backgroundImage.length)
             ]
           : null;
-
+  
       const music = isTextToSpeech
         ? audioUrl
         : folders.music.length > 0
         ? folders.music[Math.floor(Math.random() * folders.music.length)]
         : null;
-
-      if (media.length === 0 || (!music && !audioUrl)) {
+  
+      if (mediaWithDurations.length === 0 || (!music && !audioUrl)) {
         alert(
           "Please add at least one file to each folder and one music file."
         );
         setLoading(false);
         return;
       }
-
+  
+      let currentStart = 0;
+      const mediaWithStartTimes = mediaWithDurations.map((item) => {
+        const newItem = { ...item, start: currentStart };
+        currentStart += item.duration;
+        return newItem;
+      });
+  
+      // Add background image if present
       const generateResponse = await axios.post(
         "http://localhost:5000/api/video/generate",
-        { media, music, backgroundImage }
+        { media: mediaWithStartTimes, music }
       );
-
+  
       const videoId = generateResponse.data.videoId;
       if (!videoId) throw new Error("Failed to retrieve videoId");
-
+  
       const videoUrl = await pollVideoStatus(videoId);
-
+  
       if (videoUrl) {
         const response = await fetch(videoUrl);
         const videoBlob = await response.blob();
         await uploadToCloudinary(videoBlob);
-        setGeneratedVideoUrl(videoUrl); // Add this line
+        setGeneratedVideoUrl(videoUrl);
       } else {
         console.error("No video URL received after generation");
       }
@@ -425,6 +435,35 @@ function App() {
     } finally {
       setLoading(false);
     }
+  };
+  
+  const getDurationAndType = (url) => {
+    return new Promise((resolve) => {
+      const isImage = url.match(/\.(jpg|jpeg|png|gif)$/i);
+      const isVideo = url.match(/\.(mp4|mov|avi|webm|mkv)$/i);
+  
+      if (isImage) {
+        resolve({ url, duration: 5, type: 'image' });
+      } else if (isVideo) {
+        const video = document.createElement('video');
+        video.preload = 'metadata';
+  
+        video.onloadedmetadata = function() {
+          window.URL.revokeObjectURL(video.src);
+          resolve({ url, duration: video.duration, type: 'video' });
+        }
+  
+        video.onerror = function() {
+          console.error('Error loading video:', url);
+          resolve({ url, duration: 10, type: 'video' }); // Default to 10 seconds if there's an error
+        }
+  
+        video.src = url;
+      } else {
+        console.error('Unsupported media type:', url);
+        resolve({ url, duration: 5, type: 'unknown' }); // Default handling
+      }
+    });
   };
 
   const pollVideoStatus = async (id) => {
