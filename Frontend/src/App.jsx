@@ -13,11 +13,12 @@ import CloudinaryImageEffects from "./components/CloudinaryImageEffects";
 function App() {
   const [folders, setFolders] = useState({
     backgroundImage: [],
-    images: [],
-    videos: [],
-    gifs: [],
-    screenshots: [],
-    reviews: [],
+    UserIntro: [],
+    MatchdayInfo: [],
+    ProfessionalBrand: [],
+    MatchdayActivities: [],
+    Favorites: [],
+    MusicVidSong : [],
     music: [],
   });
   const [videoUrl, setVideoUrl] = useState(null);
@@ -34,11 +35,34 @@ function App() {
   const [editingImage, setEditingImage] = useState(null);
   const [showEditor, setShowEditor] = useState(false);
   const [isTextToSpeech, setIsTextToSpeech] = useState(false);
+
+
   const [name, setName] = useState("");
   const [city, setCity] = useState("");
   const [team, setTeam] = useState("");
+  const [superFanName, setSuperFanName] = useState("");
   const [job, setJob] = useState("");
   const [interests, setInterests] = useState("");
+  const [favoritePlayers, setFavoritePlayers] = useState("");
+  const [currentFavPlayer, setCurrentFavPlayer] = useState("");
+  const [matchUps, setMatchUps] = useState("");
+  const [otherFavorites, setOtherFavorites] = useState("");
+  const [shoutOuts, setShoutOuts] = useState("");
+  const [matchdayPlaylist, setMatchdayPlaylist] = useState("");
+  const [watchedWith, setWatchedWith] = useState("");
+  const [preMood, setPreMood] = useState("");
+  const [liveMood, setLiveMood] = useState("");
+  const [postMood, setPostMood] = useState("");
+  const [profession, setProfession] = useState("");
+  const [position, setPosition] = useState("");
+  const [company, setCompany] = useState("");
+  const [products, setProducts] = useState("");
+  const [previousExperiences, setPreviousExperiences] = useState("");
+  const [contactDetails, setContactDetails] = useState("");
+  
+
+
+
   const [audioUrl, setAudioUrl] = useState("");
   const [ttsLoading, setTtsLoading] = useState(false);
   const [foldersUpdateCount, setFoldersUpdateCount] = useState(0);
@@ -47,12 +71,15 @@ function App() {
   const [editingImageUrl, setEditingImageUrl] = useState(null);
   const [generatedVideoUrl, setGeneratedVideoUrl] = useState(null); // Add this line
   const [isAddingBackground, setIsAddingBackground] = useState(false);
+  const [selectedFolder, setSelectedFolder] = useState("music");
 
   // Fetch available voices on component mount
   useEffect(() => {
     const fetchVoices = async () => {
       try {
-        const response = await axios.get("https://random-proj.vercel.app/api/voices");
+        const response = await axios.get(
+          "http://localhost:5000/api/voices"
+        );
         setVoices(response.data);
       } catch (error) {
         console.error("Error fetching voices:", error);
@@ -66,7 +93,7 @@ function App() {
   const submitToTextToSpeechAPI = async (sentence, voiceCode) => {
     try {
       const response = await axios.post(
-        "https://random-proj.vercel.app/api/texttospeech",
+        "http://localhost:5000/api/texttospeech",
         {
           sentence,
           voice_code: voiceCode,
@@ -105,6 +132,168 @@ function App() {
           music: [...prevFolders.music, audioUrl],
         };
         console.log("Updated folders.music:", updatedFolders.music);
+        return updatedFolders;
+      });
+    } else {
+      console.error("Failed to add audio URL to the music folder");
+    }
+
+    setTtsLoading(false);
+    setIsTextToSpeech(false);
+  };
+
+  const handleTTSSubmitUserIntro = async (e) => {
+    e.preventDefault();
+    setTtsLoading(true);
+
+    const sentence = `Hi, my name is ${name}. I go by the SuperFan name of ${superFanName}. I'm from ${city}.`;
+    console.log("Constructed Sentence: ", sentence);
+
+    // Await the audio URL after submission
+    const audioUrl = await submitToTextToSpeechAPI(sentence, selectedVoice);
+
+    if (audioUrl) {
+      setFolders((prevFolders) => {
+        const updatedFolders = {
+          ...prevFolders,
+          UserIntro: [...prevFolders.UserIntro, audioUrl],
+        };
+        console.log("Updated folders.music:", updatedFolders.UserIntro);
+        return updatedFolders;
+      });
+    } else {
+      console.error("Failed to add audio URL to the music folder");
+    }
+
+    setTtsLoading(false);
+    setIsTextToSpeech(false);
+  };
+
+  const handleTTSSubmitMatchdayInfo= async (e) => {
+    e.preventDefault();
+    setTtsLoading(true);
+
+    const sentence = `I'm a ${team} supporter. My favourite players of all time are ${favoritePlayers}. My favourite player for this match is ${currentFavPlayer}. My respective Match Ups are ${matchUps}.`;
+    console.log("Constructed Sentence: ", sentence);
+
+    // Await the audio URL after submission
+    const audioUrl = await submitToTextToSpeechAPI(sentence, selectedVoice);
+
+    if (audioUrl) {
+      setFolders((prevFolders) => {
+        const updatedFolders = {
+          ...prevFolders,
+          MatchdayInfo: [...prevFolders.MatchdayInfo, audioUrl],
+        };
+        console.log("Updated folders.music:", updatedFolders.MatchdayInfo);
+        return updatedFolders;
+      });
+    } else {
+      console.error("Failed to add audio URL to the music folder");
+    }
+
+    setTtsLoading(false);
+    setIsTextToSpeech(false);
+  };
+
+  const handleTTSSubmitProfessionalBrand = async (e) => {
+    e.preventDefault();
+    setTtsLoading(true);
+
+    const sentence = `I'm a ${profession}, more specifically ${position} at ${company}. I specialize in ${products}. I've also got experience in ${previousExperiences}. My current fields of interests are ${interests}. Please contact me via ${contactDetails}.`;
+    console.log("Constructed Sentence: ", sentence);
+
+    // Await the audio URL after submission
+    const audioUrl = await submitToTextToSpeechAPI(sentence, selectedVoice);
+
+    if (audioUrl) {
+      setFolders((prevFolders) => {
+        const updatedFolders = {
+          ...prevFolders,
+          ProfessionalBrand: [...prevFolders.ProfessionalBrand, audioUrl],
+        };
+        console.log("Updated folders.music:", updatedFolders.ProfessionalBrand);
+        return updatedFolders;
+      });
+    } else {
+      console.error("Failed to add audio URL to the music folder");
+    }
+
+    setTtsLoading(false);
+    setIsTextToSpeech(false);
+  };
+
+  const handleTTSSubmitMatchdayActivities = async (e) => {
+    e.preventDefault();
+    setTtsLoading(true);
+
+    const sentence = `My pre-match mood was ${preMood}. My live match moods were ${liveMood}. My post-match mood is ${postMood}.`;
+    console.log("Constructed Sentence: ", sentence);
+
+    // Await the audio URL after submission
+    const audioUrl = await submitToTextToSpeechAPI(sentence, selectedVoice);
+
+    if (audioUrl) {
+      setFolders((prevFolders) => {
+        const updatedFolders = {
+          ...prevFolders,
+          MatchdayActivities: [...prevFolders.MatchdayActivities, audioUrl],
+        };
+        console.log("Updated folders.music:", updatedFolders.MatchdayActivities);
+        return updatedFolders;
+      });
+    } else {
+      console.error("Failed to add audio URL to the music folder");
+    }
+
+    setTtsLoading(false);
+    setIsTextToSpeech(false);
+  };
+
+  const handleTTSSubmitFavorites = async (e) => {
+    e.preventDefault();
+    setTtsLoading(true);
+
+    const sentence = `I watched the match with ${watchedWith}. I would like to share this Matchday video with ${shoutOuts}. Things I'm currently enjoying in life are ${otherFavorites}.`;
+    console.log("Constructed Sentence: ", sentence);
+
+    // Await the audio URL after submission
+    const audioUrl = await submitToTextToSpeechAPI(sentence, selectedVoice);
+
+    if (audioUrl) {
+      setFolders((prevFolders) => {
+        const updatedFolders = {
+          ...prevFolders,
+          Favorites: [...prevFolders.Favorites, audioUrl],
+        };
+        console.log("Updated folders.music:", updatedFolders.Favorites);
+        return updatedFolders;
+      });
+    } else {
+      console.error("Failed to add audio URL to the music folder");
+    }
+
+    setTtsLoading(false);
+    setIsTextToSpeech(false);
+  };
+
+  const handleTTSSubmitMusicVidSong = async (e) => {
+    e.preventDefault();
+    setTtsLoading(true);
+
+    const sentence = `My playlist for this Matchday Video is ${matchdayPlaylist}.`;
+    console.log("Constructed Sentence: ", sentence);
+
+    // Await the audio URL after submission
+    const audioUrl = await submitToTextToSpeechAPI(sentence, selectedVoice);
+
+    if (audioUrl) {
+      setFolders((prevFolders) => {
+        const updatedFolders = {
+          ...prevFolders,
+          MusicVidSong: [...prevFolders.MusicVidSong, audioUrl],
+        };
+        console.log("Updated folders.music:", updatedFolders.MusicVidSong);
         return updatedFolders;
       });
     } else {
@@ -178,56 +367,66 @@ function App() {
 
   const handleSubmit = async () => {
     setLoading(true);
-
+  
     try {
-      const media = Object.keys(folders).reduce((acc, key) => {
-        if (
-          key !== "music" &&
-          key !== "backgroundImage" &&
-          folders[key].length > 0
-        ) {
-          const randomIndex = Math.floor(Math.random() * folders[key].length);
-          acc.push(folders[key][randomIndex]);
-        }
-        return acc;
-      }, []);
-
+      let mediaWithDurations = await Promise.all(
+        Object.keys(folders).reduce((acc, key) => {
+          if (
+            key !== "music" &&
+            key !== "backgroundImage" &&
+            folders[key].length > 0
+          ) {
+            const randomIndex = Math.floor(Math.random() * folders[key].length);
+            acc.push(getDurationAndType(folders[key][randomIndex]));
+          }
+          return acc;
+        }, [])
+      );
+  
       const backgroundImage =
         folders.backgroundImage.length > 0
           ? folders.backgroundImage[
               Math.floor(Math.random() * folders.backgroundImage.length)
             ]
           : null;
-
+  
       const music = isTextToSpeech
         ? audioUrl
         : folders.music.length > 0
         ? folders.music[Math.floor(Math.random() * folders.music.length)]
         : null;
-
-      if (media.length === 0 || (!music && !audioUrl)) {
+  
+      if (mediaWithDurations.length === 0 || (!music && !audioUrl)) {
         alert(
           "Please add at least one file to each folder and one music file."
         );
         setLoading(false);
         return;
       }
-
+  
+      let currentStart = 0;
+      const mediaWithStartTimes = mediaWithDurations.map((item) => {
+        const newItem = { ...item, start: currentStart };
+        currentStart += item.duration;
+        return newItem;
+      });
+  
+      // Add background image if present
       const generateResponse = await axios.post(
-        "https://random-proj.vercel.app/api/video/generate",
-        { media, music, backgroundImage }
+        "http://localhost:5000/api/video/generate",
+        { media: mediaWithStartTimes, music }
       );
-
+  
       const videoId = generateResponse.data.videoId;
       if (!videoId) throw new Error("Failed to retrieve videoId");
-
+  
       const videoUrl = await pollVideoStatus(videoId);
-
+  
       if (videoUrl) {
         const response = await fetch(videoUrl);
         const videoBlob = await response.blob();
         await uploadToCloudinary(videoBlob);
-        setGeneratedVideoUrl(videoUrl); // Add this line
+        setGeneratedVideoUrl(videoUrl);
       } else {
         console.error("No video URL received after generation");
       }
@@ -236,6 +435,35 @@ function App() {
     } finally {
       setLoading(false);
     }
+  };
+  
+  const getDurationAndType = (url) => {
+    return new Promise((resolve) => {
+      const isImage = url.match(/\.(jpg|jpeg|png|gif)$/i);
+      const isVideo = url.match(/\.(mp4|mov|avi|webm|mkv)$/i);
+  
+      if (isImage) {
+        resolve({ url, duration: 5, type: 'image' });
+      } else if (isVideo) {
+        const video = document.createElement('video');
+        video.preload = 'metadata';
+  
+        video.onloadedmetadata = function() {
+          window.URL.revokeObjectURL(video.src);
+          resolve({ url, duration: video.duration, type: 'video' });
+        }
+  
+        video.onerror = function() {
+          console.error('Error loading video:', url);
+          resolve({ url, duration: 10, type: 'video' }); // Default to 10 seconds if there's an error
+        }
+  
+        video.src = url;
+      } else {
+        console.error('Unsupported media type:', url);
+        resolve({ url, duration: 5, type: 'unknown' }); // Default handling
+      }
+    });
   };
 
   const pollVideoStatus = async (id) => {
@@ -246,7 +474,7 @@ function App() {
       do {
         await new Promise((resolve) => setTimeout(resolve, 10000));
         statusResponse = await axios.get(
-          `https://random-proj.vercel.app/api/video/status/${id}`
+          `http://localhost:5000/api/video/status/${id}`
         );
         if (statusResponse.data.url) {
           setVideoUrl(statusResponse.data.url);
@@ -270,7 +498,7 @@ function App() {
     setIsAddingBackground(true);
     try {
       const response = await axios.post(
-        "https://random-proj.vercel.app/api/overlay-videos",
+        "http://localhost:5000/api/overlay-videos",
         {
           backgroundVideoUrl: folders.backgroundImage[0], // Assuming there's always one background video
           generatedVideoUrl,
@@ -329,6 +557,383 @@ function App() {
     console.log("Folders state updated in App:", folders);
   }, [folders]);
 
+  const renderForm = () => {
+    switch (selectedFolder) {
+      case "UserIntro":
+        return (
+          <form onSubmit={handleTTSSubmitUserIntro} className="space-y-4 mt-4">
+            {ttsLoading ? (
+              <div className="loader">Loading...</div>
+            ) : (
+              <>
+                <input
+                  type="text"
+                  placeholder="Name"
+                  onChange={(e) => setName(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="SuperFan Name"
+                  onChange={(e) => setSuperFanName(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="City"
+                  onChange={(e) => setCity(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <select
+                  value={selectedVoice}
+                  onChange={(e) => setSelectedVoice(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                >
+                  {voices.map((voice) => (
+                    <option key={voice.voice_code} value={voice.voice_code}>
+                      {voice.language_name} - {voice.voice_gender} (
+                      {voice.voice_type})
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="submit"
+                  className="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
+                >
+                  Submit
+                </button>
+              </>
+            )}
+          </form>
+        );
+
+      case "MatchdayInfo":
+        return (
+          <form onSubmit={handleTTSSubmitMatchdayInfo} className="space-y-4 mt-4">
+            {ttsLoading ? (
+              <div className="loader">Loading...</div>
+            ) : (
+              <>
+                <input
+                  type="text"
+                  placeholder="Team Supported"
+                  onChange={(e) => setTeam(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="All-time Favourite Players"
+                  onChange={(e) => setFavoritePlayers(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="Current Favourite Player"
+                  onChange={(e) => setCurrentFavPlayer(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="Match Ups"
+                  onChange={(e) => setMatchUps(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <select
+                  value={selectedVoice}
+                  onChange={(e) => setSelectedVoice(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                >
+                  {voices.map((voice) => (
+                    <option key={voice.voice_code} value={voice.voice_code}>
+                      {voice.language_name} - {voice.voice_gender} (
+                      {voice.voice_type})
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="submit"
+                  className="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
+                >
+                  Submit
+                </button>
+              </>
+            )}
+          </form>
+        );
+
+      case "ProfessionalBrand":
+        return (
+          <form onSubmit={handleTTSSubmitProfessionalBrand} className="space-y-4 mt-4">
+            {ttsLoading ? (
+              <div className="loader">Loading...</div>
+            ) : (
+              <>
+                <input
+                  type="text"
+                  placeholder="Profession"
+                  onChange={(e) => setProfession(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="Position"
+                  onChange={(e) => setPosition(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="Institution/Company"
+                  onChange={(e) => setCompany(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="Products/Services"
+                  onChange={(e) => setProducts(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="Previous Experiences"
+                  onChange={(e) => setPreviousExperiences(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="Current Fields of Interest"
+                  onChange={(e) => setInterests(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="Contact Details"
+                  onChange={(e) => setContactDetails(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <select
+                  value={selectedVoice}
+                  onChange={(e) => setSelectedVoice(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                >
+                  {voices.map((voice) => (
+                    <option key={voice.voice_code} value={voice.voice_code}>
+                      {voice.language_name} - {voice.voice_gender} (
+                      {voice.voice_type})
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="submit"
+                  className="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
+                >
+                  Submit
+                </button>
+              </>
+            )}
+          </form>
+        );
+
+      case "MatchdayActivities":
+        return (
+          <form onSubmit={handleTTSSubmitMatchdayActivities} className="space-y-4 mt-4">
+            {ttsLoading ? (
+              <div className="loader">Loading...</div>
+            ) : (
+              <>
+                <input
+                  type="text"
+                  placeholder="Pre-match Mood"
+                  onChange={(e) => setPreMood(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="Live Match Moods"
+                  onChange={(e) => setLiveMood(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="Post Match Mood"
+                  onChange={(e) => setPostMood(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <select
+                  value={selectedVoice}
+                  onChange={(e) => setSelectedVoice(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                >
+                  {voices.map((voice) => (
+                    <option key={voice.voice_code} value={voice.voice_code}>
+                      {voice.language_name} - {voice.voice_gender} (
+                      {voice.voice_type})
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="submit"
+                  className="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
+                >
+                  Submit
+                </button>
+              </>
+            )}
+          </form>
+        );
+
+      case "Favorites":
+        return (
+          <form onSubmit={handleTTSSubmitFavorites} className="space-y-4 mt-4">
+            {ttsLoading ? (
+              <div className="loader">Loading...</div>
+            ) : (
+              <>
+                <input
+                  type="text"
+                  placeholder="Loved Ones Oresent"
+                  onChange={(e) => setWatchedWith(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="Loved Ones - Shout Outs"
+                  onChange={(e) => setShoutOuts(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="Other favorites"
+                  onChange={(e) => setOtherFavorites(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <select
+                  value={selectedVoice}
+                  onChange={(e) => setSelectedVoice(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                >
+                  {voices.map((voice) => (
+                    <option key={voice.voice_code} value={voice.voice_code}>
+                      {voice.language_name} - {voice.voice_gender} (
+                      {voice.voice_type})
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="submit"
+                  className="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
+                >
+                  Submit
+                </button>
+              </>
+            )}
+          </form>
+        );
+
+      case "MusicVidSong":
+        return (
+          <form onSubmit={handleTTSSubmitMusicVidSong} className="space-y-4 mt-4">
+            {ttsLoading ? (
+              <div className="loader">Loading...</div>
+            ) : (
+              <>
+                <input
+                  type="text"
+                  placeholder="Matchday Playlist"
+                  onChange={(e) => setMatchdayPlaylist(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <select
+                  value={selectedVoice}
+                  onChange={(e) => setSelectedVoice(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                >
+                  {voices.map((voice) => (
+                    <option key={voice.voice_code} value={voice.voice_code}>
+                      {voice.language_name} - {voice.voice_gender} (
+                      {voice.voice_type})
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="submit"
+                  className="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
+                >
+                  Submit
+                </button>
+              </>
+            )}
+          </form>
+        );
+
+      // Add similar cases for Professional Brand, Matchday Activities, Favorites
+      // ...
+
+      case "music":
+        return (
+          <form onSubmit={handleTTSSubmit} className="space-y-4 mt-4">
+            {ttsLoading ? (
+              <div className="loader">Loading...</div>
+            ) : (
+              <>
+                <input
+                  type="text"
+                  placeholder="Name"
+                  onChange={(e) => setName(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="City"
+                  onChange={(e) => setCity(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="Team"
+                  onChange={(e) => setTeam(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="Job"
+                  onChange={(e) => setJob(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+                <input
+                  type="text"
+                  placeholder="Interests"
+                  onChange={(e) => setInterests(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                />
+
+                <select
+                  value={selectedVoice}
+                  onChange={(e) => setSelectedVoice(e.target.value)}
+                  className="p-2 border border-gray-300 rounded w-full"
+                >
+                  {voices.map((voice) => (
+                    <option key={voice.voice_code} value={voice.voice_code}>
+                      {voice.language_name} - {voice.voice_gender} (
+                      {voice.voice_type})
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="submit"
+                  className="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
+                >
+                  Submit
+                </button>
+              </>
+            )}
+          </form>
+        );
+
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex">
       {/* Sidebar */}
@@ -336,6 +941,7 @@ function App() {
         key={foldersUpdateCount}
         folders={folders}
         setFolders={setFolders}
+        setSelectedFolder={setSelectedFolder}
         setIsTextToSpeech={setIsTextToSpeech}
         onEditImage={handleEditImage}
       />
@@ -368,81 +974,23 @@ function App() {
               </div>
             )}
             {/* Show either TTS form or video generation button */}
-            {isTextToSpeech ? (
-              <form onSubmit={handleTTSSubmit} className="space-y-4 mt-4">
-                {ttsLoading ? (
-                  <div className="loader">Loading...</div>
-                ) : (
-                  <>
-                    <input
-                      type="text"
-                      placeholder="Name"
-                      onChange={(e) => setName(e.target.value)}
-                      className="p-2 border border-gray-300 rounded w-full"
-                    />
-                    <input
-                      type="text"
-                      placeholder="City"
-                      onChange={(e) => setCity(e.target.value)}
-                      className="p-2 border border-gray-300 rounded w-full"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Team"
-                      onChange={(e) => setTeam(e.target.value)}
-                      className="p-2 border border-gray-300 rounded w-full"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Job"
-                      onChange={(e) => setJob(e.target.value)}
-                      className="p-2 border border-gray-300 rounded w-full"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Interests"
-                      onChange={(e) => setInterests(e.target.value)}
-                      className="p-2 border border-gray-300 rounded w-full"
-                    />
-
-                    <select
-                      value={selectedVoice}
-                      onChange={(e) => setSelectedVoice(e.target.value)}
-                      className="p-2 border border-gray-300 rounded w-full"
-                    >
-                      {voices.map((voice) => (
-                        <option key={voice.voice_code} value={voice.voice_code}>
-                          {voice.language_name} - {voice.voice_gender} (
-                          {voice.voice_type})
-                        </option>
-                      ))}
-                    </select>
-                    <button
-                      type="submit"
-                      className="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
-                    >
-                      Submit
-                    </button>
-                  </>
+            {isTextToSpeech
+              ? renderForm()
+              : Object.values(folders).some((folder) => folder.length > 0) && (
+                  <button
+                    onClick={handleSubmit}
+                    className="flex items-center justify-center bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full mt-4"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      "Generating..."
+                    ) : (
+                      <>
+                        <FaVideo className="mr-2" /> Generate Video
+                      </>
+                    )}
+                  </button>
                 )}
-              </form>
-            ) : (
-              Object.values(folders).some((folder) => folder.length > 0) && (
-                <button
-                  onClick={handleSubmit}
-                  className="flex items-center justify-center bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full mt-4"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    "Generating..."
-                  ) : (
-                    <>
-                      <FaVideo className="mr-2" /> Generate Video
-                    </>
-                  )}
-                </button>
-              )
-            )}
             {generatedVideoUrl && ( // Add this block
               <button
                 onClick={handleAddBackground}

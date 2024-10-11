@@ -19,6 +19,7 @@ const Sidebar = ({
   setIsTextToSpeech,
   audioUrl,
   onEditImage,
+  setSelectedFolder,
 }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [loadingStates, setLoadingStates] = useState({});
@@ -26,6 +27,8 @@ const Sidebar = ({
   const [selectedImage, setSelectedImage] = useState(null); // State to store the selected image for editing
   const [showImageEditor, setShowImageEditor] = useState(false); // State to control the visibility of the image editor
   const [isConverting, setIsConverting] = useState(false);
+  const [isCombining, setIsCombining] = useState(false);
+  const [combiningFolder, setCombiningFolder] = useState(null);
 
   const toggleSidebar = () => setIsOpen(!isOpen);
 
@@ -134,27 +137,32 @@ const Sidebar = ({
       alert("No image available to convert.");
       return;
     }
-  
+
     setIsConverting(true);
     const imageUrl = folders.backgroundImage[0]; // Assuming we're converting the first image
-  
+
     try {
-      const response = await axios.post("https://random-proj.vercel.app/api/convert-to-video", { imageUrl });
+      const response = await axios.post(
+        "http://localhost:5000/api/convert-to-video",
+        { imageUrl }
+      );
       const { jobId } = response.data;
-  
+
       const checkStatus = async () => {
         try {
-          const statusResponse = await axios.get(`https://random-proj.vercel.app/api/check-job-status/${jobId}`);
+          const statusResponse = await axios.get(
+            `http://localhost:5000/api/check-job-status/${jobId}`
+          );
           const { status, videoUrl } = statusResponse.data;
-  
-          if (status === 'done') {
-            setFolders(prevFolders => ({
+
+          if (status === "done") {
+            setFolders((prevFolders) => ({
               ...prevFolders,
-              backgroundImage: [videoUrl]
+              backgroundImage: [videoUrl],
             }));
             alert("Image successfully converted to video!");
             setIsConverting(false);
-          } else if (status === 'failed') {
+          } else if (status === "failed") {
             alert("Failed to convert image to video.");
             setIsConverting(false);
           } else {
@@ -166,7 +174,7 @@ const Sidebar = ({
           setIsConverting(false);
         }
       };
-  
+
       checkStatus();
     } catch (error) {
       console.error("Error converting image to video:", error);
@@ -174,8 +182,93 @@ const Sidebar = ({
       setIsConverting(false);
     }
   };
-  
 
+  const handleCombineAudioWithMedia = async (folderName) => {
+    if (folders[folderName].length < 2) {
+      alert("No media or TTS audio available in this folder.");
+      return;
+    }
+
+    const ttsUrl = folders[folderName].find((url) =>
+      url.includes("https://storage.googleapis.com")
+    );
+    const mediaUrl = folders[folderName].find(
+      (url) => !url.includes("https://storage.googleapis.com")
+    );
+
+    if (!ttsUrl || !mediaUrl) {
+      alert(
+        "Both TTS audio and media (image/video) are required in this folder."
+      );
+      return;
+    }
+
+    setIsCombining(true);
+    setCombiningFolder(folderName);
+
+    // Create an audio element to load the TTS audio
+    const audio = new Audio(ttsUrl);
+
+    audio.addEventListener("loadedmetadata", async () => {
+      const audioDuration = audio.duration;
+
+      try {
+        const response = await axios.post(
+          "http://localhost:5000/api/combine-media-and-audio",
+          { imageUrl: mediaUrl, ttsUrl, audioDuration }
+        );
+        const { jobId } = response.data;
+
+        const checkStatus = async () => {
+          try {
+            const statusResponse = await axios.get(
+              `http://localhost:5000/api/check-job-status/${jobId}`
+            );
+            const { status, videoUrl } = statusResponse.data;
+
+            if (status === "done") {
+              setFolders((prevFolders) => ({
+                ...prevFolders,
+                [folderName]: [videoUrl],
+              }));
+              alert(
+                `Media successfully combined with audio in ${folderName} folder!`
+              );
+              setIsCombining(false);
+              setCombiningFolder(null);
+            } else if (status === "failed") {
+              alert(
+                `Failed to combine media with audio in ${folderName} folder.`
+              );
+              setIsCombining(false);
+              setCombiningFolder(null);
+            } else {
+              setTimeout(checkStatus, 5000); // Poll every 5 seconds
+            }
+          } catch (error) {
+            console.error("Error checking job status:", error);
+            alert("Failed to check job status. Please try again.");
+            setIsCombining(false);
+            setCombiningFolder(null);
+          }
+        };
+
+        checkStatus();
+      } catch (error) {
+        console.error("Error combining media with audio:", error);
+        alert("Failed to combine media with audio. Please try again.");
+        setIsCombining(false);
+        setCombiningFolder(null);
+      }
+    });
+
+    // Add error handling if the audio fails to load
+    audio.addEventListener("error", () => {
+      alert("Failed to load audio. Please check the TTS URL.");
+      setIsCombining(false);
+      setCombiningFolder(null);
+    });
+  };
 
   return (
     <div
@@ -195,7 +288,6 @@ const Sidebar = ({
           {Object.keys(folders).map((folderName) => (
             <div key={folderName} className="mb-6">
               <h3 className="text-lg font-semibold mb-2">{folderName}</h3>
-
               {folderName === "music" ? (
                 <>
                   <div className="music-options mb-4">
@@ -219,7 +311,10 @@ const Sidebar = ({
                       Select Background Song
                     </button>
                     <button
-                      onClick={() => setIsTextToSpeech(true)}
+                      onClick={() => {
+                        setSelectedFolder("music");
+                        setIsTextToSpeech(true);
+                      }}
                       className="bg-neutral-800 text-white p-2 rounded-lg w-full"
                     >
                       Use Text-to-Speech
@@ -238,7 +333,7 @@ const Sidebar = ({
                 </>
               ) : (
                 <>
-                  <div className="flex items-center mb-2">
+                  <div className="flex-col items-center mb-2">
                     <button
                       onClick={() =>
                         document
@@ -256,6 +351,18 @@ const Sidebar = ({
                         </>
                       )}
                     </button>
+
+                    <button
+                      onClick={() => {
+                        console.log("Folder clicked:", folderName); // Debug to see if folderName is correct
+                        setSelectedFolder(folderName);
+                        setIsTextToSpeech(true);
+                      }}
+                      className="bg-neutral-800 mt-4 text-white p-2 rounded-lg w-full"
+                    >
+                      Use Text-to-Speech
+                    </button>
+
                     <input
                       id={`file-upload-${folderName}`}
                       type="file"
@@ -266,7 +373,28 @@ const Sidebar = ({
                       className="hidden"
                     />
                   </div>
-
+                  {folderName !== "music" &&
+                    folders[folderName].some((url) =>
+                      url.includes("https://storage.googleapis.com")
+                    ) && // Check for TTS
+                    folders[folderName].some((url) =>
+                      url.match(/\.(jpg|jpeg|png|gif|mp4|mov|avi|webm|mkv)$/i)
+                    ) && ( // Check for image/video
+                      <button
+                        onClick={() => handleCombineAudioWithMedia(folderName)}
+                        className="bg-gray-500 text-white p-2 rounded-lg w-full flex items-center justify-center mt-2"
+                        disabled={isCombining}
+                      >
+                        {isCombining && combiningFolder === folderName ? (
+                          <>
+                            <FaSpinner className="inline-block mr-2 animate-spin" />
+                            Combining...
+                          </>
+                        ) : (
+                          "Combine with TTS"
+                        )}
+                      </button>
+                    )}
                   {folderName === "backgroundImage" &&
                     folders[folderName].length > 0 && (
                       <button
@@ -306,7 +434,7 @@ const Sidebar = ({
                       <img
                         src={url}
                         alt={`uploaded ${folderName}`}
-                        className="w-full h-20 object-cover rounded-lg"
+                        className="w-full mt-2 h-20 object-cover rounded-lg"
                       />
                     );
                   } else if (isVideo) {
