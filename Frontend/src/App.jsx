@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FaVideo, FaSpinner } from "react-icons/fa";
 import Sidebar from "./components/Sidebar";
 import VideoPreview from "./components/VideoPreview";
@@ -18,7 +18,7 @@ function App() {
     ProfessionalBrand: [],
     MatchdayActivities: [],
     Favorites: [],
-    MusicVidSong : [],
+    MusicVidSong: [],
     music: [],
   });
   const [videoUrl, setVideoUrl] = useState(null);
@@ -35,7 +35,6 @@ function App() {
   const [editingImage, setEditingImage] = useState(null);
   const [showEditor, setShowEditor] = useState(false);
   const [isTextToSpeech, setIsTextToSpeech] = useState(false);
-
 
   const [name, setName] = useState("");
   const [city, setCity] = useState("");
@@ -59,9 +58,6 @@ function App() {
   const [products, setProducts] = useState("");
   const [previousExperiences, setPreviousExperiences] = useState("");
   const [contactDetails, setContactDetails] = useState("");
-  
-
-
 
   const [audioUrl, setAudioUrl] = useState("");
   const [ttsLoading, setTtsLoading] = useState(false);
@@ -73,27 +69,33 @@ function App() {
   const [isAddingBackground, setIsAddingBackground] = useState(false);
   const [selectedFolder, setSelectedFolder] = useState("music");
 
-  // Fetch available voices on component mount
-  useEffect(() => {
-    const fetchVoices = async () => {
-      try {
-        const response = await axios.get(
-          "https://random-proj.vercel.app/api/voices"
-        );
-        setVoices(response.data);
-      } catch (error) {
-        console.error("Error fetching voices:", error);
-      }
-    };
+  const [recording, setRecording] = useState(false);
+  const [audioBlob, setAudioBlob] = useState(null);
+  const [availableVoices, setAvailableVoices] = useState([]);
+  const mediaRecorderRef = useRef(null);
+  const audioChunks = useRef([]);
 
-    fetchVoices();
-  }, []);
+  // Fetch available voices on component mount
+  // useEffect(() => {
+  //   const fetchVoices = async () => {
+  //     try {
+  //       const response = await axios.get(
+  //         "https://random-proj.vercel.app/api/voices"
+  //       );
+  //       setVoices(response.data);
+  //     } catch (error) {
+  //       console.error("Error fetching voices:", error);
+  //     }
+  //   };
+
+  //   fetchVoices();
+  // }, []);
 
   // Function to submit TTS data to your backend API
   const submitToTextToSpeechAPI = async (sentence, voiceCode) => {
     try {
       const response = await axios.post(
-        "https://random-proj.vercel.app/api/texttospeech",
+        "http://localhost:5000/api/texttospeech",
         {
           sentence,
           voice_code: voiceCode,
@@ -169,7 +171,7 @@ function App() {
     setIsTextToSpeech(false);
   };
 
-  const handleTTSSubmitMatchdayInfo= async (e) => {
+  const handleTTSSubmitMatchdayInfo = async (e) => {
     e.preventDefault();
     setTtsLoading(true);
 
@@ -239,7 +241,10 @@ function App() {
           ...prevFolders,
           MatchdayActivities: [...prevFolders.MatchdayActivities, audioUrl],
         };
-        console.log("Updated folders.music:", updatedFolders.MatchdayActivities);
+        console.log(
+          "Updated folders.music:",
+          updatedFolders.MatchdayActivities
+        );
         return updatedFolders;
       });
     } else {
@@ -367,7 +372,7 @@ function App() {
 
   const handleSubmit = async () => {
     setLoading(true);
-  
+
     try {
       let mediaWithDurations = await Promise.all(
         Object.keys(folders).reduce((acc, key) => {
@@ -382,20 +387,20 @@ function App() {
           return acc;
         }, [])
       );
-  
+
       const backgroundImage =
         folders.backgroundImage.length > 0
           ? folders.backgroundImage[
               Math.floor(Math.random() * folders.backgroundImage.length)
             ]
           : null;
-  
+
       const music = isTextToSpeech
         ? audioUrl
         : folders.music.length > 0
         ? folders.music[Math.floor(Math.random() * folders.music.length)]
         : null;
-  
+
       if (mediaWithDurations.length === 0 || (!music && !audioUrl)) {
         alert(
           "Please add at least one file to each folder and one music file."
@@ -403,25 +408,25 @@ function App() {
         setLoading(false);
         return;
       }
-  
+
       let currentStart = 0;
       const mediaWithStartTimes = mediaWithDurations.map((item) => {
         const newItem = { ...item, start: currentStart };
         currentStart += item.duration;
         return newItem;
       });
-  
+
       // Add background image if present
       const generateResponse = await axios.post(
         "https://random-proj.vercel.app/api/video/generate",
         { media: mediaWithStartTimes, music }
       );
-  
+
       const videoId = generateResponse.data.videoId;
       if (!videoId) throw new Error("Failed to retrieve videoId");
-  
+
       const videoUrl = await pollVideoStatus(videoId);
-  
+
       if (videoUrl) {
         const response = await fetch(videoUrl);
         const videoBlob = await response.blob();
@@ -436,32 +441,32 @@ function App() {
       setLoading(false);
     }
   };
-  
+
   const getDurationAndType = (url) => {
     return new Promise((resolve) => {
       const isImage = url.match(/\.(jpg|jpeg|png|gif)$/i);
       const isVideo = url.match(/\.(mp4|mov|avi|webm|mkv)$/i);
-  
+
       if (isImage) {
-        resolve({ url, duration: 5, type: 'image' });
+        resolve({ url, duration: 5, type: "image" });
       } else if (isVideo) {
-        const video = document.createElement('video');
-        video.preload = 'metadata';
-  
-        video.onloadedmetadata = function() {
+        const video = document.createElement("video");
+        video.preload = "metadata";
+
+        video.onloadedmetadata = function () {
           window.URL.revokeObjectURL(video.src);
-          resolve({ url, duration: video.duration, type: 'video' });
-        }
-  
-        video.onerror = function() {
-          console.error('Error loading video:', url);
-          resolve({ url, duration: 10, type: 'video' }); // Default to 10 seconds if there's an error
-        }
-  
+          resolve({ url, duration: video.duration, type: "video" });
+        };
+
+        video.onerror = function () {
+          console.error("Error loading video:", url);
+          resolve({ url, duration: 10, type: "video" }); // Default to 10 seconds if there's an error
+        };
+
         video.src = url;
       } else {
-        console.error('Unsupported media type:', url);
-        resolve({ url, duration: 5, type: 'unknown' }); // Default handling
+        console.error("Unsupported media type:", url);
+        resolve({ url, duration: 5, type: "unknown" }); // Default handling
       }
     });
   };
@@ -557,6 +562,89 @@ function App() {
     console.log("Folders state updated in App:", folders);
   }, [folders]);
 
+  //eleven labs start here
+
+  const startRecording = async () => {
+    try {
+      // Request permission and access to the microphone
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+
+      // Clear previous chunks
+      audioChunks.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        // Push each chunk of audio data to the array
+        audioChunks.current.push(event.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        // Combine all chunks into a single Blob after recording stops
+        const blob = new Blob(audioChunks.current, { type: "audio/wav" });
+        setAudioBlob(blob); // Set audioBlob to the recorded audio
+        console.log("Recording stopped, audio blob created:", blob);
+      };
+
+      // Start recording and save the mediaRecorder instance to the ref
+      mediaRecorder.start();
+      mediaRecorderRef.current = mediaRecorder;
+      setRecording(true);
+    } catch (error) {
+      console.error("Error accessing microphone:", error);
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop(); // Stop recording
+      setRecording(false);
+
+      // Check if the audioBlob is correctly set
+      console.log("Audio blob:", audioBlob);
+    }
+  };
+
+  const uploadVoice = async () => {
+    console.log("Upload voice function called"); // Add this for debugging
+
+    if (!audioBlob) {
+      console.error("No audio data available to upload.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", audioBlob, "user-voice.wav");
+    formData.append("name", "User Custom Voice");
+    formData.append("description", "Custom voice for TTS");
+    formData.append("remove_background_noise", "true");
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/create-voice",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      console.log("Voice created:", response.data);
+    } catch (error) {
+      console.error("Error uploading voice:", error);
+    }
+  };
+
+  const fetchVoices = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/voices");
+      setAvailableVoices(response.data.voices);
+    } catch (error) {
+      console.error("Error fetching voices:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchVoices();
+  }, []);
+
   const renderForm = () => {
     switch (selectedFolder) {
       case "UserIntro":
@@ -584,18 +672,39 @@ function App() {
                   onChange={(e) => setCity(e.target.value)}
                   className="p-2 border border-gray-300 rounded w-full"
                 />
-                <select
-                  value={selectedVoice}
-                  onChange={(e) => setSelectedVoice(e.target.value)}
-                  className="p-2 border border-gray-300 rounded w-full"
-                >
-                  {voices.map((voice) => (
-                    <option key={voice.voice_code} value={voice.voice_code}>
-                      {voice.language_name} - {voice.voice_gender} (
-                      {voice.voice_type})
-                    </option>
-                  ))}
-                </select>
+                <div className="flex flex-row gap-2 w-full">
+                  <select
+                    value={selectedVoice}
+                    onChange={(e) => setSelectedVoice(e.target.value)}
+                    className="p-2 border border-gray-300 rounded w-full"
+                  >
+                    {availableVoices && availableVoices.length > 0 ? (
+                      availableVoices.map((voice) => (
+                        <option key={voice.voice_id} value={voice.voice_id}>
+                          {voice.name}
+                        </option>
+                      ))
+                    ) : (
+                      <option>Loading voices...</option>
+                    )}
+                  </select>
+                  <button
+                    type="button"
+                    className="bg-black text-white p-2"
+                    onClick={recording ? stopRecording : startRecording}
+                  >
+                    {recording ? "Stop Recording" : "Record Voice"}
+                  </button>
+                  {audioBlob && (
+                    <button
+                      className="bg-black text-white p-2"
+                      type="button"
+                      onClick={uploadVoice}
+                    >
+                      Upload Voice
+                    </button>
+                  )}
+                </div>
                 <button
                   type="submit"
                   className="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
@@ -609,7 +718,10 @@ function App() {
 
       case "MatchdayInfo":
         return (
-          <form onSubmit={handleTTSSubmitMatchdayInfo} className="space-y-4 mt-4">
+          <form
+            onSubmit={handleTTSSubmitMatchdayInfo}
+            className="space-y-4 mt-4"
+          >
             {ttsLoading ? (
               <div className="loader">Loading...</div>
             ) : (
@@ -663,7 +775,10 @@ function App() {
 
       case "ProfessionalBrand":
         return (
-          <form onSubmit={handleTTSSubmitProfessionalBrand} className="space-y-4 mt-4">
+          <form
+            onSubmit={handleTTSSubmitProfessionalBrand}
+            className="space-y-4 mt-4"
+          >
             {ttsLoading ? (
               <div className="loader">Loading...</div>
             ) : (
@@ -735,7 +850,10 @@ function App() {
 
       case "MatchdayActivities":
         return (
-          <form onSubmit={handleTTSSubmitMatchdayActivities} className="space-y-4 mt-4">
+          <form
+            onSubmit={handleTTSSubmitMatchdayActivities}
+            className="space-y-4 mt-4"
+          >
             {ttsLoading ? (
               <div className="loader">Loading...</div>
             ) : (
@@ -831,7 +949,10 @@ function App() {
 
       case "MusicVidSong":
         return (
-          <form onSubmit={handleTTSSubmitMusicVidSong} className="space-y-4 mt-4">
+          <form
+            onSubmit={handleTTSSubmitMusicVidSong}
+            className="space-y-4 mt-4"
+          >
             {ttsLoading ? (
               <div className="loader">Loading...</div>
             ) : (

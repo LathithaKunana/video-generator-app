@@ -30,6 +30,10 @@ const Sidebar = ({
   const [isCombining, setIsCombining] = useState(false);
   const [combiningFolder, setCombiningFolder] = useState(null);
 
+  const [recording, setRecording] = useState(false);
+  const [audioBlob, setAudioBlob] = useState(null);
+  const [availableVoices, setAvailableVoices] = useState([]);
+  
   const toggleSidebar = () => setIsOpen(!isOpen);
 
   useEffect(() => {
