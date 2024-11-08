@@ -637,7 +637,7 @@ function App() {
       const response = await axios.get(
         "https://random-proj.vercel.app/api/voices"
       );
-      setAvailableVoices(response.data);
+      setAvailableVoices(response.data.voices);
     } catch (error) {
       console.error("Error fetching voices:", error);
     }
