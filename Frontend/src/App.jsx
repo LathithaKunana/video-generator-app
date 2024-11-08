@@ -101,7 +101,7 @@ function App() {
           voice_code: voiceCode,
         }
       );
-  
+
       if (response.data.audioUrl) {
         console.log("Audio URL received from API:", response.data.audioUrl);
         setAudioUrl(response.data.audioUrl);
@@ -150,6 +150,12 @@ function App() {
       alert("Please select a voice first");
       return;
     }
+
+    if (!name || !superFanName || !city) {
+      alert("Please fill in all fields");
+      return;
+    }
+
     setTtsLoading(true);
 
     const sentence = `Hi, my name is ${name}. I go by the SuperFan name of ${superFanName}. I'm from ${city}.`;
@@ -641,11 +647,12 @@ function App() {
       const response = await axios.get(
         "https://random-proj.vercel.app/api/voices"
       );
-      setAvailableVoices(response.data.voices); // Access the voices array
-
-      // Set default voice to the first voice in the list
-      if (response.data.voices && response.data.voices.length > 0) {
-        setSelectedVoice(response.data.voices[0].voice_id);
+      if (response.data.voices && Array.isArray(response.data.voices)) {
+        setAvailableVoices(response.data.voices);
+        // Only set default voice if none is selected
+        if (!selectedVoice && response.data.voices.length > 0) {
+          setSelectedVoice(response.data.voices[0].voice_id);
+        }
       }
     } catch (error) {
       console.error("Error fetching voices:", error);
@@ -692,7 +699,7 @@ function App() {
                   <select
                     value={selectedVoice}
                     onChange={(e) => setSelectedVoice(e.target.value)}
-                    className="p-2 border border-gray-300 rounded w-full"
+                    className="p-2 border border-gray-300 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   >
                     <option value="">Select a voice</option>
@@ -718,6 +725,7 @@ function App() {
                       Upload Voice
                     </button>
                   )}
+                  
                 </div>
                 <button
                   type="submit"
