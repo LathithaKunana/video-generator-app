@@ -638,9 +638,11 @@ function App() {
 
   const fetchVoices = async () => {
     try {
-      const response = await axios.get("https://random-proj.vercel.app/api/voices");
+      const response = await axios.get(
+        "https://random-proj.vercel.app/api/voices"
+      );
       setAvailableVoices(response.data.voices); // Access the voices array
-      
+
       // Set default voice to the first voice in the list
       if (response.data.voices && response.data.voices.length > 0) {
         setSelectedVoice(response.data.voices[0].voice_id);
@@ -653,7 +655,7 @@ function App() {
   useEffect(() => {
     fetchVoices();
   }, []);
-  
+
   useEffect(() => {
     console.log("Available voices:", availableVoices);
     console.log("Selected voice:", selectedVoice);
@@ -691,16 +693,17 @@ function App() {
                     value={selectedVoice}
                     onChange={(e) => setSelectedVoice(e.target.value)}
                     className="p-2 border border-gray-300 rounded w-full"
+                    required // Add required to prevent empty submissions
                   >
+                    <option value="">Select a voice</option>
                     {availableVoices && availableVoices.length > 0 ? (
                       availableVoices.map((voice) => (
-                        // Use voice_id from ElevenLabs response
                         <option key={voice.voice_id} value={voice.voice_id}>
                           {voice.name}
                         </option>
                       ))
                     ) : (
-                      <option>Loading voices...</option>
+                      <option value="">Loading voices...</option>
                     )}
                   </select>
                   <button
