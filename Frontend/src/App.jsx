@@ -642,6 +642,28 @@ function App() {
     }
   };
 
+  const fetchVoices = async () => {
+    try {
+      const response = await axios.get(
+        "https://random-proj.vercel.app/api/voices"
+      );
+      if (
+        response.data &&
+        response.data.voices &&
+        response.data.voices.length > 0
+      ) {
+        setAvailableVoices(response.data.voices);
+        if (!selectedVoice) {
+          setSelectedVoice(response.data.voices[0].voice_id);
+        }
+      } else {
+        console.error("No voices found in the response.");
+      }
+    } catch (error) {
+      console.error("Error fetching voices:", error);
+    }
+  };
+
   const fetchVoicesData = async () => {
     try {
       const response = await fetchVoices();
