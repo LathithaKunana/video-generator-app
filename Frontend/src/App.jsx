@@ -647,10 +647,17 @@ function App() {
       const response = await axios.get(
         "https://random-proj.vercel.app/api/voices"
       );
-      setAvailableVoices(response.data.voices);
-      // Only set default voice if none is selected
-      if (!selectedVoice && response.data.voices.length > 0) {
-        setSelectedVoice(response.data.voices[0].voice_id);
+      if (
+        response.data &&
+        response.data.voices &&
+        response.data.voices.length > 0
+      ) {
+        setAvailableVoices(response.data.voices);
+        if (!selectedVoice) {
+          setSelectedVoice(response.data.voices[0].voice_id);
+        }
+      } else {
+        console.error("No voices found in the response.");
       }
     } catch (error) {
       console.error("Error fetching voices:", error);
@@ -666,6 +673,11 @@ function App() {
     console.log("Selected voice:", selectedVoice);
   }, [availableVoices, selectedVoice]);
 
+  useEffect(() => {
+    console.log("Updated availableVoices:", availableVoices);
+  }, [availableVoices]);
+
+  
   const renderForm = () => {
     switch (selectedFolder) {
       case "UserIntro":
