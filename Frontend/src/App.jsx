@@ -648,11 +648,10 @@ function App() {
         "https://random-proj.vercel.app/api/voices"
       );
       setAvailableVoices(response.data.voices);
-        // Only set default voice if none is selected
-        if (!selectedVoice && response.data.voices.length > 0) {
-          setSelectedVoice(response.data.voices[0].voice_id);
-        }
-      
+      // Only set default voice if none is selected
+      if (!selectedVoice && response.data.voices.length > 0) {
+        setSelectedVoice(response.data.voices[0].voice_id);
+      }
     } catch (error) {
       console.error("Error fetching voices:", error);
     }
@@ -696,17 +695,18 @@ function App() {
                 />
                 <div className="flex flex-row gap-2 w-full">
                   <select
-                    value={selectedVoice}
+                    value={selectedVoice || "9BWtsMINqrJLrRacOk9x"}
                     onChange={(e) => setSelectedVoice(e.target.value)}
                     className="p-2 border border-gray-300 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   >
                     <option value="">Select a voice</option>
-                    {availableVoices.map((voice) => (
-                      <option key={voice.voice_id} value={voice.voice_id}>
-                        {voice.name}
-                      </option>
-                    ))}
+                    {availableVoices &&
+                      availableVoices.map((voice) => (
+                        <option key={voice.voice_id} value={voice.voice_id}>
+                          {voice.name}
+                        </option>
+                      ))}
                   </select>
                   <button
                     type="button"
@@ -724,7 +724,6 @@ function App() {
                       Upload Voice
                     </button>
                   )}
-                  
                 </div>
                 <button
                   type="submit"
