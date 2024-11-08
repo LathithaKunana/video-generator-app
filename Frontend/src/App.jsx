@@ -95,7 +95,7 @@ function App() {
   const submitToTextToSpeechAPI = async (sentence, voiceCode) => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/texttospeech",
+        "https://random-proj.vercel.app/api/texttospeech",
         {
           sentence,
           voice_code: voiceCode,
@@ -620,7 +620,7 @@ function App() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/create-voice",
+        "https://random-proj.vercel.app/api/create-voice",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -634,7 +634,7 @@ function App() {
 
   const fetchVoices = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/voices");
+      const response = await axios.get("https://random-proj.vercel.app/api/voices");
       setAvailableVoices(response.data.voices);
     } catch (error) {
       console.error("Error fetching voices:", error);
@@ -750,18 +750,39 @@ function App() {
                   onChange={(e) => setMatchUps(e.target.value)}
                   className="p-2 border border-gray-300 rounded w-full"
                 />
-                <select
-                  value={selectedVoice}
-                  onChange={(e) => setSelectedVoice(e.target.value)}
-                  className="p-2 border border-gray-300 rounded w-full"
-                >
-                  {voices.map((voice) => (
-                    <option key={voice.voice_code} value={voice.voice_code}>
-                      {voice.language_name} - {voice.voice_gender} (
-                      {voice.voice_type})
-                    </option>
-                  ))}
-                </select>
+                <div className="flex flex-row gap-2 w-full">
+                  <select
+                    value={selectedVoice}
+                    onChange={(e) => setSelectedVoice(e.target.value)}
+                    className="p-2 border border-gray-300 rounded w-full"
+                  >
+                    {availableVoices && availableVoices.length > 0 ? (
+                      availableVoices.map((voice) => (
+                        <option key={voice.voice_id} value={voice.voice_id}>
+                          {voice.name}
+                        </option>
+                      ))
+                    ) : (
+                      <option>Loading voices...</option>
+                    )}
+                  </select>
+                  <button
+                    type="button"
+                    className="bg-black text-white p-2"
+                    onClick={recording ? stopRecording : startRecording}
+                  >
+                    {recording ? "Stop Recording" : "Record Voice"}
+                  </button>
+                  {audioBlob && (
+                    <button
+                      className="bg-black text-white p-2"
+                      type="button"
+                      onClick={uploadVoice}
+                    >
+                      Upload Voice
+                    </button>
+                  )}
+                </div>
                 <button
                   type="submit"
                   className="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
@@ -825,18 +846,39 @@ function App() {
                   onChange={(e) => setContactDetails(e.target.value)}
                   className="p-2 border border-gray-300 rounded w-full"
                 />
-                <select
-                  value={selectedVoice}
-                  onChange={(e) => setSelectedVoice(e.target.value)}
-                  className="p-2 border border-gray-300 rounded w-full"
-                >
-                  {voices.map((voice) => (
-                    <option key={voice.voice_code} value={voice.voice_code}>
-                      {voice.language_name} - {voice.voice_gender} (
-                      {voice.voice_type})
-                    </option>
-                  ))}
-                </select>
+                <div className="flex flex-row gap-2 w-full">
+                  <select
+                    value={selectedVoice}
+                    onChange={(e) => setSelectedVoice(e.target.value)}
+                    className="p-2 border border-gray-300 rounded w-full"
+                  >
+                    {availableVoices && availableVoices.length > 0 ? (
+                      availableVoices.map((voice) => (
+                        <option key={voice.voice_id} value={voice.voice_id}>
+                          {voice.name}
+                        </option>
+                      ))
+                    ) : (
+                      <option>Loading voices...</option>
+                    )}
+                  </select>
+                  <button
+                    type="button"
+                    className="bg-black text-white p-2"
+                    onClick={recording ? stopRecording : startRecording}
+                  >
+                    {recording ? "Stop Recording" : "Record Voice"}
+                  </button>
+                  {audioBlob && (
+                    <button
+                      className="bg-black text-white p-2"
+                      type="button"
+                      onClick={uploadVoice}
+                    >
+                      Upload Voice
+                    </button>
+                  )}
+                </div>
                 <button
                   type="submit"
                   className="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
@@ -876,18 +918,39 @@ function App() {
                   onChange={(e) => setPostMood(e.target.value)}
                   className="p-2 border border-gray-300 rounded w-full"
                 />
-                <select
-                  value={selectedVoice}
-                  onChange={(e) => setSelectedVoice(e.target.value)}
-                  className="p-2 border border-gray-300 rounded w-full"
-                >
-                  {voices.map((voice) => (
-                    <option key={voice.voice_code} value={voice.voice_code}>
-                      {voice.language_name} - {voice.voice_gender} (
-                      {voice.voice_type})
-                    </option>
-                  ))}
-                </select>
+                <div className="flex flex-row gap-2 w-full">
+                  <select
+                    value={selectedVoice}
+                    onChange={(e) => setSelectedVoice(e.target.value)}
+                    className="p-2 border border-gray-300 rounded w-full"
+                  >
+                    {availableVoices && availableVoices.length > 0 ? (
+                      availableVoices.map((voice) => (
+                        <option key={voice.voice_id} value={voice.voice_id}>
+                          {voice.name}
+                        </option>
+                      ))
+                    ) : (
+                      <option>Loading voices...</option>
+                    )}
+                  </select>
+                  <button
+                    type="button"
+                    className="bg-black text-white p-2"
+                    onClick={recording ? stopRecording : startRecording}
+                  >
+                    {recording ? "Stop Recording" : "Record Voice"}
+                  </button>
+                  {audioBlob && (
+                    <button
+                      className="bg-black text-white p-2"
+                      type="button"
+                      onClick={uploadVoice}
+                    >
+                      Upload Voice
+                    </button>
+                  )}
+                </div>
                 <button
                   type="submit"
                   className="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
@@ -924,18 +987,39 @@ function App() {
                   onChange={(e) => setOtherFavorites(e.target.value)}
                   className="p-2 border border-gray-300 rounded w-full"
                 />
-                <select
-                  value={selectedVoice}
-                  onChange={(e) => setSelectedVoice(e.target.value)}
-                  className="p-2 border border-gray-300 rounded w-full"
-                >
-                  {voices.map((voice) => (
-                    <option key={voice.voice_code} value={voice.voice_code}>
-                      {voice.language_name} - {voice.voice_gender} (
-                      {voice.voice_type})
-                    </option>
-                  ))}
-                </select>
+                <div className="flex flex-row gap-2 w-full">
+                  <select
+                    value={selectedVoice}
+                    onChange={(e) => setSelectedVoice(e.target.value)}
+                    className="p-2 border border-gray-300 rounded w-full"
+                  >
+                    {availableVoices && availableVoices.length > 0 ? (
+                      availableVoices.map((voice) => (
+                        <option key={voice.voice_id} value={voice.voice_id}>
+                          {voice.name}
+                        </option>
+                      ))
+                    ) : (
+                      <option>Loading voices...</option>
+                    )}
+                  </select>
+                  <button
+                    type="button"
+                    className="bg-black text-white p-2"
+                    onClick={recording ? stopRecording : startRecording}
+                  >
+                    {recording ? "Stop Recording" : "Record Voice"}
+                  </button>
+                  {audioBlob && (
+                    <button
+                      className="bg-black text-white p-2"
+                      type="button"
+                      onClick={uploadVoice}
+                    >
+                      Upload Voice
+                    </button>
+                  )}
+                </div>
                 <button
                   type="submit"
                   className="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
@@ -963,18 +1047,39 @@ function App() {
                   onChange={(e) => setMatchdayPlaylist(e.target.value)}
                   className="p-2 border border-gray-300 rounded w-full"
                 />
-                <select
-                  value={selectedVoice}
-                  onChange={(e) => setSelectedVoice(e.target.value)}
-                  className="p-2 border border-gray-300 rounded w-full"
-                >
-                  {voices.map((voice) => (
-                    <option key={voice.voice_code} value={voice.voice_code}>
-                      {voice.language_name} - {voice.voice_gender} (
-                      {voice.voice_type})
-                    </option>
-                  ))}
-                </select>
+                <div className="flex flex-row gap-2 w-full">
+                  <select
+                    value={selectedVoice}
+                    onChange={(e) => setSelectedVoice(e.target.value)}
+                    className="p-2 border border-gray-300 rounded w-full"
+                  >
+                    {availableVoices && availableVoices.length > 0 ? (
+                      availableVoices.map((voice) => (
+                        <option key={voice.voice_id} value={voice.voice_id}>
+                          {voice.name}
+                        </option>
+                      ))
+                    ) : (
+                      <option>Loading voices...</option>
+                    )}
+                  </select>
+                  <button
+                    type="button"
+                    className="bg-black text-white p-2"
+                    onClick={recording ? stopRecording : startRecording}
+                  >
+                    {recording ? "Stop Recording" : "Record Voice"}
+                  </button>
+                  {audioBlob && (
+                    <button
+                      className="bg-black text-white p-2"
+                      type="button"
+                      onClick={uploadVoice}
+                    >
+                      Upload Voice
+                    </button>
+                  )}
+                </div>
                 <button
                   type="submit"
                   className="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
@@ -1027,18 +1132,39 @@ function App() {
                   className="p-2 border border-gray-300 rounded w-full"
                 />
 
-                <select
-                  value={selectedVoice}
-                  onChange={(e) => setSelectedVoice(e.target.value)}
-                  className="p-2 border border-gray-300 rounded w-full"
-                >
-                  {voices.map((voice) => (
-                    <option key={voice.voice_code} value={voice.voice_code}>
-                      {voice.language_name} - {voice.voice_gender} (
-                      {voice.voice_type})
-                    </option>
-                  ))}
-                </select>
+<div className="flex flex-row gap-2 w-full">
+                  <select
+                    value={selectedVoice}
+                    onChange={(e) => setSelectedVoice(e.target.value)}
+                    className="p-2 border border-gray-300 rounded w-full"
+                  >
+                    {availableVoices && availableVoices.length > 0 ? (
+                      availableVoices.map((voice) => (
+                        <option key={voice.voice_id} value={voice.voice_id}>
+                          {voice.name}
+                        </option>
+                      ))
+                    ) : (
+                      <option>Loading voices...</option>
+                    )}
+                  </select>
+                  <button
+                    type="button"
+                    className="bg-black text-white p-2"
+                    onClick={recording ? stopRecording : startRecording}
+                  >
+                    {recording ? "Stop Recording" : "Record Voice"}
+                  </button>
+                  {audioBlob && (
+                    <button
+                      className="bg-black text-white p-2"
+                      type="button"
+                      onClick={uploadVoice}
+                    >
+                      Upload Voice
+                    </button>
+                  )}
+                </div>
                 <button
                   type="submit"
                   className="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
