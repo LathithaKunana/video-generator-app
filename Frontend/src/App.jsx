@@ -646,17 +646,14 @@ function App() {
     try {
       const response = await axios.get("https://random-proj.vercel.app/api/voices");
 
-      // Log the entire response to see its structure
-      console.log("API response:", response);
-
-      // Check if response.data.voices exists
-      if (response.data && response.data.voices && Array.isArray(response.data.voices)) {
-        setAvailableVoices(response.data.voices);
-        console.log("Updated availableVoices:", response.data.voices);
+      // Check if response.data.voices.voices exists and is an array
+      if (response.data && response.data.voices && Array.isArray(response.data.voices.voices)) {
+        setAvailableVoices(response.data.voices.voices); // Update to voices.voices
+        console.log("Updated availableVoices:", response.data.voices.voices);
 
         // Only set default voice if none is selected
-        if (!selectedVoice && response.data.voices.length > 0) {
-          setSelectedVoice(response.data.voices[0].voice_id);
+        if (!selectedVoice && response.data.voices.voices.length > 0) {
+          setSelectedVoice(response.data.voices.voices[0].voice_id);
         }
       } else {
         console.error("No voices found in the response.");
@@ -664,7 +661,7 @@ function App() {
     } catch (error) {
       console.error("Error fetching voices:", error);
     }
-  };
+};
 
   
 
