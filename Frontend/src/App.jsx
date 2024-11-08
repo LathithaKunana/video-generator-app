@@ -101,7 +101,7 @@ function App() {
           voice_code: voiceCode,
         }
       );
-
+  
       if (response.data.audioUrl) {
         console.log("Audio URL received from API:", response.data.audioUrl);
         setAudioUrl(response.data.audioUrl);
@@ -693,18 +693,14 @@ function App() {
                     value={selectedVoice}
                     onChange={(e) => setSelectedVoice(e.target.value)}
                     className="p-2 border border-gray-300 rounded w-full"
-                    required // Add required to prevent empty submissions
+                    required
                   >
                     <option value="">Select a voice</option>
-                    {availableVoices && availableVoices.length > 0 ? (
-                      availableVoices.map((voice) => (
-                        <option key={voice.voice_id} value={voice.voice_id}>
-                          {voice.name}
-                        </option>
-                      ))
-                    ) : (
-                      <option value="">Loading voices...</option>
-                    )}
+                    {availableVoices.map((voice) => (
+                      <option key={voice.voice_id} value={voice.voice_id}>
+                        {voice.name}
+                      </option>
+                    ))}
                   </select>
                   <button
                     type="button"
