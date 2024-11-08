@@ -695,18 +695,22 @@ function App() {
                 />
                 <div className="flex flex-row gap-2 w-full">
                   <select
-                    value={selectedVoice || "9BWtsMINqrJLrRacOk9x"}
+                    value={selectedVoice}
                     onChange={(e) => setSelectedVoice(e.target.value)}
-                    className="p-2 border border-gray-300 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="p-2 border border-gray-300 rounded w-full"
                     required
                   >
                     <option value="">Select a voice</option>
-                    {availableVoices &&
+                    {Array.isArray(availableVoices) &&
+                    availableVoices.length > 0 ? (
                       availableVoices.map((voice) => (
                         <option key={voice.voice_id} value={voice.voice_id}>
                           {voice.name}
                         </option>
-                      ))}
+                      ))
+                    ) : (
+                      <option value="">Loading voices...</option>
+                    )}
                   </select>
                   <button
                     type="button"
