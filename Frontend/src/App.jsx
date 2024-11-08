@@ -644,12 +644,18 @@ function App() {
 
   const fetchVoices = async () => {
     try {
-      const response = await axios.get(
-        "https://random-proj.vercel.app/api/voices"
-      );
-      if (response.data && response.data.voices && response.data.voices.length > 0) {
+      const response = await axios.get("https://random-proj.vercel.app/api/voices");
+
+      // Log the entire response to see its structure
+      console.log("API response:", response);
+
+      // Check if response.data.voices exists
+      if (response.data && response.data.voices && Array.isArray(response.data.voices)) {
         setAvailableVoices(response.data.voices);
-        if (!selectedVoice) {
+        console.log("Updated availableVoices:", response.data.voices);
+
+        // Only set default voice if none is selected
+        if (!selectedVoice && response.data.voices.length > 0) {
           setSelectedVoice(response.data.voices[0].voice_id);
         }
       } else {
@@ -659,6 +665,7 @@ function App() {
       console.error("Error fetching voices:", error);
     }
   };
+
   
 
   useEffect(() => {
