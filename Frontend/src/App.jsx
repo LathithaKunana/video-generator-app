@@ -63,7 +63,7 @@ function App() {
   const [ttsLoading, setTtsLoading] = useState(false);
   const [foldersUpdateCount, setFoldersUpdateCount] = useState(0);
   const [voices, setVoices] = useState([]);
-  const [selectedVoice, setSelectedVoice] = useState("en-US-1");
+  const [selectedVoice, setSelectedVoice] = useState("");
   const [editingImageUrl, setEditingImageUrl] = useState(null);
   const [generatedVideoUrl, setGeneratedVideoUrl] = useState(null); // Add this line
   const [isAddingBackground, setIsAddingBackground] = useState(false);
@@ -634,8 +634,10 @@ function App() {
 
   const fetchVoices = async () => {
     try {
-      const response = await axios.get("https://random-proj.vercel.app/api/voices");
-      setAvailableVoices(response.data.voices);
+      const response = await axios.get(
+        "https://random-proj.vercel.app/api/voices"
+      );
+      setAvailableVoices(response.data);
     } catch (error) {
       console.error("Error fetching voices:", error);
     }
@@ -680,6 +682,7 @@ function App() {
                   >
                     {availableVoices && availableVoices.length > 0 ? (
                       availableVoices.map((voice) => (
+                        // Use voice_id from ElevenLabs response
                         <option key={voice.voice_id} value={voice.voice_id}>
                           {voice.name}
                         </option>
@@ -1132,7 +1135,7 @@ function App() {
                   className="p-2 border border-gray-300 rounded w-full"
                 />
 
-<div className="flex flex-row gap-2 w-full">
+                <div className="flex flex-row gap-2 w-full">
                   <select
                     value={selectedVoice}
                     onChange={(e) => setSelectedVoice(e.target.value)}
