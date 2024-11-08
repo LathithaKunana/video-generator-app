@@ -659,7 +659,7 @@ function App() {
   };
 
   useEffect(() => {
-    fetchVoices();
+    fetchVoicesData();
   }, []);
 
   useEffect(() => {
