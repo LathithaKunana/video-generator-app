@@ -647,7 +647,7 @@ function App() {
       const response = await axios.get(
         "https://random-proj.vercel.app/api/voices"
       );
-      setAvailableVoices(response.data.voices);
+      setAvailableVoices(data.voices);
       // Only set default voice if none is selected
       if (!selectedVoice && response.data.voices.length > 0) {
         setSelectedVoice(response.data.voices[0].voice_id);
@@ -701,8 +701,7 @@ function App() {
                     required
                   >
                     <option value="">Select a voice</option>
-                    {Array.isArray(availableVoices) &&
-                    availableVoices.length > 0 ? (
+                    {availableVoices.length > 0 ? (
                       availableVoices.map((voice) => (
                         <option key={voice.voice_id} value={voice.voice_id}>
                           {voice.name}
