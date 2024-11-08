@@ -647,13 +647,12 @@ function App() {
       const response = await axios.get(
         "https://random-proj.vercel.app/api/voices"
       );
-      if (response.data.voices && Array.isArray(response.data.voices)) {
-        setAvailableVoices(response.data.voices);
+      setAvailableVoices(response.data.voices);
         // Only set default voice if none is selected
         if (!selectedVoice && response.data.voices.length > 0) {
           setSelectedVoice(response.data.voices[0].voice_id);
         }
-      }
+      
     } catch (error) {
       console.error("Error fetching voices:", error);
     }
