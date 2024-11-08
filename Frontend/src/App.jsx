@@ -146,6 +146,10 @@ function App() {
 
   const handleTTSSubmitUserIntro = async (e) => {
     e.preventDefault();
+    if (!selectedVoice) {
+      alert("Please select a voice first");
+      return;
+    }
     setTtsLoading(true);
 
     const sentence = `Hi, my name is ${name}. I go by the SuperFan name of ${superFanName}. I'm from ${city}.`;
@@ -634,10 +638,13 @@ function App() {
 
   const fetchVoices = async () => {
     try {
-      const response = await axios.get(
-        "https://random-proj.vercel.app/api/voices"
-      );
-      setAvailableVoices(response.data.voices);
+      const response = await axios.get("https://random-proj.vercel.app/api/voices");
+      setAvailableVoices(response.data.voices); // Access the voices array
+      
+      // Set default voice to the first voice in the list
+      if (response.data.voices && response.data.voices.length > 0) {
+        setSelectedVoice(response.data.voices[0].voice_id);
+      }
     } catch (error) {
       console.error("Error fetching voices:", error);
     }
@@ -646,6 +653,11 @@ function App() {
   useEffect(() => {
     fetchVoices();
   }, []);
+  
+  useEffect(() => {
+    console.log("Available voices:", availableVoices);
+    console.log("Selected voice:", selectedVoice);
+  }, [availableVoices, selectedVoice]);
 
   const renderForm = () => {
     switch (selectedFolder) {
