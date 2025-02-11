@@ -726,14 +726,14 @@ function App() {
                   </select>
                   <button
                     type="button"
-                    className="bg-black text-white p-2"
+                    className="bg-fuchsia-900 text-white p-2"
                     onClick={recording ? stopRecording : startRecording}
                   >
                     {recording ? "Stop Recording" : "Record Voice"}
                   </button>
                   {audioBlob && (
                     <button
-                      className="bg-black text-white p-2"
+                      className="bg-fuchsia-900 text-white p-2"
                       type="button"
                       onClick={uploadVoice}
                     >
@@ -743,7 +743,7 @@ function App() {
                 </div>
                 <button
                   type="submit"
-                  className="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
+                  className="bg-fuchsia-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
                 >
                   Submit
                 </button>
@@ -804,14 +804,14 @@ function App() {
                   </select>
                   <button
                     type="button"
-                    className="bg-black text-white p-2"
+                    className="bg-fuchsia-900 text-white p-2"
                     onClick={recording ? stopRecording : startRecording}
                   >
                     {recording ? "Stop Recording" : "Record Voice"}
                   </button>
                   {audioBlob && (
                     <button
-                      className="bg-black text-white p-2"
+                      className="bg-fuchsia-900 text-white p-2"
                       type="button"
                       onClick={uploadVoice}
                     >
@@ -821,7 +821,7 @@ function App() {
                 </div>
                 <button
                   type="submit"
-                  className="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
+                  className="bg-fuchsia-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
                 >
                   Submit
                 </button>
@@ -900,14 +900,14 @@ function App() {
                   </select>
                   <button
                     type="button"
-                    className="bg-black text-white p-2"
+                    className="bg-fuchsia-900 text-white p-2"
                     onClick={recording ? stopRecording : startRecording}
                   >
                     {recording ? "Stop Recording" : "Record Voice"}
                   </button>
                   {audioBlob && (
                     <button
-                      className="bg-black text-white p-2"
+                      className="bg-fuchsia-900 text-white p-2"
                       type="button"
                       onClick={uploadVoice}
                     >
@@ -917,7 +917,7 @@ function App() {
                 </div>
                 <button
                   type="submit"
-                  className="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
+                  className="bg-fuchsia-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
                 >
                   Submit
                 </button>
@@ -972,14 +972,14 @@ function App() {
                   </select>
                   <button
                     type="button"
-                    className="bg-black text-white p-2"
+                    className="bg-fuchsia-900 text-white p-2"
                     onClick={recording ? stopRecording : startRecording}
                   >
                     {recording ? "Stop Recording" : "Record Voice"}
                   </button>
                   {audioBlob && (
                     <button
-                      className="bg-black text-white p-2"
+                      className="bg-fuchsia-900 text-white p-2"
                       type="button"
                       onClick={uploadVoice}
                     >
@@ -989,7 +989,7 @@ function App() {
                 </div>
                 <button
                   type="submit"
-                  className="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
+                  className="bg-fuchsia-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
                 >
                   Submit
                 </button>
@@ -1041,14 +1041,14 @@ function App() {
                   </select>
                   <button
                     type="button"
-                    className="bg-black text-white p-2"
+                    className="bg-fuchsia-900 text-white p-2"
                     onClick={recording ? stopRecording : startRecording}
                   >
                     {recording ? "Stop Recording" : "Record Voice"}
                   </button>
                   {audioBlob && (
                     <button
-                      className="bg-black text-white p-2"
+                      className="bg-fuchsia-900 text-white p-2"
                       type="button"
                       onClick={uploadVoice}
                     >
@@ -1058,7 +1058,7 @@ function App() {
                 </div>
                 <button
                   type="submit"
-                  className="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
+                  className="bg-fuchsia-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
                 >
                   Submit
                 </button>
@@ -1101,14 +1101,14 @@ function App() {
                   </select>
                   <button
                     type="button"
-                    className="bg-black text-white p-2"
+                    className="bg-fuchsia-900 text-white p-2"
                     onClick={recording ? stopRecording : startRecording}
                   >
                     {recording ? "Stop Recording" : "Record Voice"}
                   </button>
                   {audioBlob && (
                     <button
-                      className="bg-black text-white p-2"
+                      className="bg-fuchsia-900 text-white p-2"
                       type="button"
                       onClick={uploadVoice}
                     >
@@ -1118,7 +1118,7 @@ function App() {
                 </div>
                 <button
                   type="submit"
-                  className="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
+                  className="bg-fuchsia-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
                 >
                   Submit
                 </button>
@@ -1186,14 +1186,14 @@ function App() {
                   </select>
                   <button
                     type="button"
-                    className="bg-black text-white p-2"
+                    className="bg-fuchsia-900 text-white p-2"
                     onClick={recording ? stopRecording : startRecording}
                   >
                     {recording ? "Stop Recording" : "Record Voice"}
                   </button>
                   {audioBlob && (
                     <button
-                      className="bg-black text-white p-2"
+                      className="bg-fuchsia-900 text-white p-2"
                       type="button"
                       onClick={uploadVoice}
                     >
@@ -1203,7 +1203,7 @@ function App() {
                 </div>
                 <button
                   type="submit"
-                  className="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
+                  className="bg-fuchsia-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full"
                 >
                   Submit
                 </button>
@@ -1218,7 +1218,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
+    <div className="min-h-screen bg-gray-300 flex">
       {/* Sidebar */}
       <Sidebar
         key={foldersUpdateCount}
@@ -1262,7 +1262,7 @@ function App() {
               : Object.values(folders).some((folder) => folder.length > 0) && (
                   <button
                     onClick={handleSubmit}
-                    className="flex items-center justify-center bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full mt-4"
+                    className="flex items-center justify-center bg-fuchsia-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full mt-4"
                     disabled={loading}
                   >
                     {loading ? (
@@ -1277,7 +1277,7 @@ function App() {
             {generatedVideoUrl && ( // Add this block
               <button
                 onClick={handleAddBackground}
-                className="flex items-center justify-center bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full mt-4"
+                className="flex items-center justify-center bg-fuchsia-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 w-full mt-4"
               >
                 {isAddingBackground ? (
                   <>
@@ -1303,7 +1303,7 @@ function App() {
                   />
                   <button
                     onClick={handleGenerateSidebar}
-                    className="flex items-center justify-center bg-neutral-800 text-white px-4 py-2 rounded-lg hover:bg-neutral-600 w-full mt-4"
+                    className="flex items-center justify-center bg-fuchsia-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-600 w-full mt-4"
                   >
                     Generate Sidebar
                   </button>
@@ -1328,7 +1328,7 @@ function App() {
             <div className="middle-section flex flex-col justify-center items-center mx-4">
               <button
                 onClick={handleRandomSelection}
-                className="random-select-btn bg-neutral-800 text-white p-2 rounded-lg"
+                className="random-select-btn bg-fuchsia-900 text-white p-2 rounded-lg"
               >
                 Select Random Images
               </button>

@@ -89,10 +89,10 @@ const NewSidebar = ({ folders, setFolders, setIsFinalized, setInitialThumbnails 
   
 
   return (
-    <div className={`fixed top-0 left-0 h-screen bg-gray-900 z-50 transition-all duration-300 ${isOpen ? 'w-64 sm:w-72' : 'w-16'}`}>
+    <div className={`fixed top-0 left-0 h-screen bg-gray-400 z-50 transition-all duration-300 ${isOpen ? 'w-64 sm:w-72' : 'w-16'}`}>
       <button
         onClick={toggleSidebar}
-        className="absolute top-4 -right-3 bg-gray-900 p-2 rounded-full shadow-md text-white z-10"
+        className="absolute top-4 -right-3 bg-fuchsia-300 p-2 rounded-full shadow-md text-white z-10"
       >
         {isOpen ? <FaArrowLeft /> : <FaArrowRight />}
       </button>
@@ -103,7 +103,7 @@ const NewSidebar = ({ folders, setFolders, setIsFinalized, setInitialThumbnails 
             <div className="flex items-center mb-2">
               <button
                 onClick={() => document.getElementById(`file-upload-${folderName}`).click()}
-                className="flex items-center bg-blue-500 p-2 rounded-lg text-white shadow-md hover:bg-blue-600"
+                className="flex items-center bg-fuchsia-400 p-2 rounded-lg text-white shadow-md hover:bg-blue-600"
                 disabled={loadingStates[folderName]}
               >
                 {loadingStates[folderName] ? (
