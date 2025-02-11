@@ -278,11 +278,11 @@ const Sidebar = ({
     <div
       className={`flex ${
         isOpen ? "w-64" : "w-16"
-      } transition-all duration-300 bg-gray-600 h-screen relative`}
+      } transition-all duration-300 bg-gray-400 h-screen relative`}
     >
       <button
         onClick={toggleSidebar}
-        className="absolute top-4 right-[-14px] bg-gray-400 p-2 rounded-full shadow-md text-white"
+        className="absolute top-4 right-[-14px] bg-fuchsia-300 p-2 rounded-full shadow-md text-white"
       >
         {isOpen ? <FaArrowLeft /> : <FaArrowRight />}
       </button>
@@ -310,7 +310,7 @@ const Sidebar = ({
                           .getElementById("background-music-upload")
                           .click()
                       }
-                      className="bg-neutral-800 text-white p-2 shadow-md rounded-lg mb-2 w-full"
+                      className="bg-fuchsia-800 text-white p-2 shadow-md rounded-lg mb-2 w-full"
                     >
                       Select Background Song
                     </button>
@@ -319,7 +319,7 @@ const Sidebar = ({
                         setSelectedFolder("music");
                         setIsTextToSpeech(true);
                       }}
-                      className="bg-neutral-800 text-white p-2 rounded-lg w-full"
+                      className="bg-fuchsia-400 text-white p-2 rounded-lg w-full"
                     >
                       Use Text-to-Speech
                     </button>
@@ -329,7 +329,7 @@ const Sidebar = ({
                   {folders.music.length >= 2 && (
                     <button
                       onClick={handleCombineAudio}
-                      className="bg-gray-400 text-white p-2 rounded-lg w-full flex items-center justify-center"
+                      className="bg-fuchsia-400 text-white p-2 rounded-lg w-full flex items-center justify-center"
                     >
                       Combine audio
                     </button>
@@ -344,7 +344,7 @@ const Sidebar = ({
                           .getElementById(`file-upload-${folderName}`)
                           .click()
                       }
-                      className="flex items-center bg-gray-400 p-2 rounded-lg text-white shadow-md hover:bg-gray-800"
+                      className="flex items-center bg-fuchsia-400 p-2 rounded-lg text-white shadow-md hover:bg-gray-800"
                       disabled={loadingStates[folderName]}
                     >
                       {loadingStates[folderName] ? (
@@ -362,7 +362,7 @@ const Sidebar = ({
                         setSelectedFolder(folderName);
                         setIsTextToSpeech(true);
                       }}
-                      className="bg-neutral-800 mt-4 text-white p-2 rounded-lg w-full"
+                      className="bg-fuchsia-600 mt-4 text-white p-2 rounded-lg w-full"
                     >
                       Use Text-to-Speech
                     </button>
@@ -403,7 +403,7 @@ const Sidebar = ({
                     folders[folderName].length > 0 && (
                       <button
                         onClick={handleConvertToVideo}
-                        className="bg-blue-500 text-white p-2 rounded-lg w-full mb-2 hover:bg-blue-600 disabled:bg-gray-400"
+                        className="bg-fuchsia-900 text-white p-2 rounded-lg w-full mb-2 hover:bg-blue-600 disabled:bg-gray-400"
                         disabled={isConverting}
                       >
                         {isConverting ? (
